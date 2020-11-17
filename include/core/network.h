@@ -9,7 +9,7 @@ class Model {
  public:
   // sigmoid activation method
   // loss function
-  // back propagationI
+  // back propagation
  private:
   // neurons
   // weights, probably a map/vector/2dvector of doubles
