@@ -3,3 +3,6 @@
 //
 
 #include "../../include/core/network.h"
+namespace neural_net {
+
+}; // namespace neural_net

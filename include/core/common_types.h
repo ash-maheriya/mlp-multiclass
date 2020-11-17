@@ -3,3 +3,6 @@
 //
 #pragma once
 
+namespace neural_net {
+
+}; // namespace neural_net

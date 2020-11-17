@@ -8,15 +8,19 @@
 #include <stdexcept>
 #include <vector>
 
+namespace neural_net {
+
 double Neuron::ForwardPass(std::vector<double> weights,
-                         std::vector<double> values){
+                           std::vector<double> values) {
   UpdateValue(weights, values);
   return Sigmoid();
 }
 
-void Neuron::UpdateValue(std::vector<double> weights, std::vector<double> values) {
+void Neuron::UpdateValue(std::vector<double> weights,
+                         std::vector<double> values) {
   if (weights.size() != values.size()) {
-    throw std::invalid_argument("Must have the same number of weights and values");
+    throw std::invalid_argument(
+        "Must have the same number of weights and values");
   }
   for (size_t i = 0; i < weights.size(); i++) {
     value_ += weights[i] * values[i];
@@ -26,7 +30,8 @@ void Neuron::UpdateValue(std::vector<double> weights, std::vector<double> values
   }
 }
 
-double Neuron::Sigmoid(){
-  activation_ = (value_)/(1+value_);
+double Neuron::Sigmoid() {
+  activation_ = (value_) / (1 + value_);
   return activation_;
 }
+}A

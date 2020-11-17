@@ -3,6 +3,7 @@
 //
 
 #include "core/layer.h"
+namespace neural_net {
 Layer::Layer(size_t size) : kSize(size){
   for (size_t i = 0; i <= size; i++) {
     weights.push_back(0);
@@ -14,3 +15,4 @@ Layer::Layer(size_t size) : kSize(size){
 double Layer::GetSize() const{
   return kSize;
 }
+}; // namespace neural_net

@@ -3,6 +3,8 @@
 //
 #pragma once
 
+namespace neural_net {
+
 class Model {
  public:
   // sigmoid activation method
@@ -11,3 +13,4 @@ class Model {
  private:
   // neurons
 };
+}; // namespace neural_net
