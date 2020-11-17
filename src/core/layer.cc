@@ -4,10 +4,13 @@
 
 #include "core/layer.h"
 Layer::Layer(size_t size) : kSize(size){
-  for (int i = 0; i <= size; i++) {
+  for (size_t i = 0; i <= size; i++) {
     weights.push_back(0);
     values.push_back(0);
   }
   values[0] = 1;
   weights[0] = kBias;
+}
+double Layer::GetSize() const{
+  return kSize;
 }
