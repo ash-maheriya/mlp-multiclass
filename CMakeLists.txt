@@ -1,6 +1,6 @@
 cmake_minimum_required(VERSION 3.12 FATAL_ERROR)
 set(CMAKE_CXX_STANDARD 11)
-project(ideal-gas)
+project(final-project)
 
 # This tells the compiler to not aggressively optimize and
 # to include debugging information so that the debugger
@@ -50,19 +50,21 @@ include("${CINDER_PATH}/proj/cmake/modules/cinderMakeApp.cmake")
 
 list(APPEND SOURCE_FILES    ${CORE_SOURCE_FILES}
         src/visualizer/neural_network_app.cc
-        src/core/model.cc)
+        src/core/network.cc
+        src/core/neuron.cc
+        src/core/layer.cc)
 
 list(APPEND TEST_FILES tests/test_main.cc)
 
 ci_make_app(
-        APP_NAME        ideal-gas-simulation
+        APP_NAME        neural-net-visualization
         CINDER_PATH     ${CINDER_PATH}
         SOURCES         apps/cinder_app_main.cc ${SOURCE_FILES}
         INCLUDES        include
 )
 
 ci_make_app(
-        APP_NAME        ideal-gas-test
+        APP_NAME        neural-net-test
         CINDER_PATH     ${CINDER_PATH}
         SOURCES         tests/test_main.cc ${SOURCE_FILES} ${TEST_FILES}
         INCLUDES        include
@@ -70,5 +72,5 @@ ci_make_app(
 )
 
 if(MSVC)
-    set_property(TARGET ideal-gas-test APPEND_STRING PROPERTY LINK_FLAGS " /SUBSYSTEM:CONSOLE")
+    set_property(TARGET neural-net-test APPEND_STRING PROPERTY LINK_FLAGS " /SUBSYSTEM:CONSOLE")
 endif()
