@@ -31,11 +31,19 @@ Network::Network(size_t image_size) : kImageSize(image_size){
   }
 
   // Creating the layers
-  for (size_t i = 0; i < num_hidden_layers_+2; i++) {
-    layers_.push_back(Layer(&weights_[i]));
+  layers_.push_back(Layer(&weights_[0], true, false));
+  for (size_t i = 1; i < num_hidden_layers_+1; i++) {
+    layers_.push_back(Layer(&weights_[i], false, false));
   }
+  layers_.push_back(Layer(&weights_[weights_.size()-1], false, true));
 }
 size_t Network::GetNumHiddenLayers() {
   return num_hidden_layers_;
+}
+void Network::ForwardPass() {
+  layers_[0].ForwardPassInput(&layers_[1]);
+  layers_[1].ForwardPassHidden(&layers_[0], &layers_[2]);
+  layers_[2].ForwardPassHidden(&layers_[1], &layers_[3]);
+  layers_[3].ForwardPassOutput(&layers_[2]);
 }
 } // namespace neural_net

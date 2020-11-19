@@ -28,4 +28,7 @@ double Neuron::Sigmoid(double value) {
   activation_ = 1.0 / (1.0 + exp(value));
   return activation_;
 }
+double Neuron::GetActivation() {
+  return activation_;
+}
 }  // namespace neural_net

@@ -11,6 +11,16 @@ class Network {
  public:
   // TODO: READ NETWORK DEFINITION FROM JSON FILE
   Network(size_t image_size);
+
+  /**
+   * Runs the forward pass functionality through every layer
+   */
+  void ForwardPass();
+
+  /**
+   * Returns the number of hidden layers in the network
+   * @return the number of hidden layers in the network
+   */
   size_t GetNumHiddenLayers();
  private:
   const size_t kImageSize;

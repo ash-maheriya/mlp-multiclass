@@ -20,6 +20,8 @@ class Neuron {
    */
   double ForwardPass(const std::vector<double>& weights, const std::vector<double>& values);
 
+  double GetActivation();
+
  private:
   /**
    * Sigmoid activation function maps the given value on the sigmoid graph
