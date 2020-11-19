@@ -5,7 +5,7 @@
 #include "core/layer.h"
 #include <vector>
 namespace neural_net {
-Layer::Layer(size_t size, size_t next_layer_size) : kSize(size){
+Layer::Layer(size_t size, size_t next_layer_size, std::vector<std::vector<double>> weights) : weights_(weights), kSize(size){
 //  for (size_t i = 0; i <= size; i++) {
 //    weights_.push_back(std::vector<double>);
 //    values_.push_back(0);

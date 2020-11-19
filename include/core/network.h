@@ -13,8 +13,8 @@ class Network {
   Network();
   // back propagation
  private:
-  Weight_Collection_t weights;
-  size_t num_hidden_layers;
+  Weight_Collection_t weights_;
+  size_t num_hidden_layers_;
   std::vector<Layer> layers_;
 };
 } // namespace neural_net

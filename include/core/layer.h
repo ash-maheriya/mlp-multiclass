@@ -5,10 +5,24 @@
 
 #include <vector>
 namespace neural_net {
+/**
+ * The layers that comprise the network
+ */
 class Layer {
  public:
-  Layer(size_t size, size_t next_layer_size);
-  void ForwardPass();
+  Layer(size_t size, size_t next_layer_size, std::vector<std::vector<double>> weights);
+
+  /**
+   * Runs the forward pass of every neuron in the layer and passes the values
+   * onto the next layer in the network
+   * @param next_layer
+   */
+  void ForwardPass(Layer* next_layer);
+
+  /**
+   * Returns how many neurons are in the layer
+   * @return how many neurons are in the layer
+   */
   double GetSize() const;
 
  private:
