@@ -9,6 +9,6 @@ Layer::Layer(std::vector<std::vector<double>>* weights) : weights_(weights){
 
 }
 double Layer::GetSize() const{
-  return weights_->size();
+  return weights_->size() - 1;
 }
 } // namespace neural_net

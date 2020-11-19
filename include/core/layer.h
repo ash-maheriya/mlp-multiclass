@@ -26,8 +26,9 @@ class Layer {
   double GetSize() const;
 
  private:
+  const double kBias = 1;
   std::vector<std::vector<double>>* weights_;
   std::vector<double> values_;
-  const double kBias = 1;
+
 };
 }
