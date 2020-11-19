@@ -28,8 +28,11 @@ class NeuralNetworkApp : public ci::app::App {
 
   const double kMargin = 150;
 
+  const size_t kImageSize = 28;
+
  private:
-  Network network_;
+
+  Network network_ = Network(kImageSize);
 };
 
 }  // namespace visualizer

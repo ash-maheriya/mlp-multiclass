@@ -5,15 +5,10 @@
 #include "core/layer.h"
 #include <vector>
 namespace neural_net {
-Layer::Layer(size_t size, size_t next_layer_size, std::vector<std::vector<double>> weights) : weights_(weights), kSize(size){
-//  for (size_t i = 0; i <= size; i++) {
-//    weights_.push_back(std::vector<double>);
-//    values_.push_back(0);
-//  }
-//  values_[0] = 1;
-//  weights_[0] = kBias;
+Layer::Layer(std::vector<std::vector<double>>* weights) : weights_(weights){
+
 }
 double Layer::GetSize() const{
-  return kSize;
+  return weights_->size();
 }
 } // namespace neural_net
