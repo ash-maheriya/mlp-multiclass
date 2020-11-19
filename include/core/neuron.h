@@ -9,13 +9,10 @@ namespace neural_net {
 class Neuron {
  public:
   // forward propagation (takes input and output states as arguments and computes output state from the input state)
-  double ForwardPass(std::vector<double> weights, std::vector<double> values);
+  double ForwardPass(const std::vector<double>& weights, const std::vector<double>& values);
 
  private:
-  void UpdateValue(std::vector<double> weights, std::vector<double> values);
-  double Sigmoid();
-
-  double value_ = 0;
+  double Sigmoid(double value);
   double activation_ = 0;
 };
-};
+} // namespace neural_net

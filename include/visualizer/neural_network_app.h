@@ -1,10 +1,37 @@
-//
-// Created by ash on 11/14/20.
-//
+#pragma once
 
-#ifndef FINAL_PROJECT_ASH_MAHERIYA_NEURAL_NETWORK_APP_H
-#define FINAL_PROJECT_ASH_MAHERIYA_NEURAL_NETWORK_APP_H
+#include <core/network.h>
+#include <time.h>
 
-class NeuralNetworkApp {};
+#include "cinder/app/App.h"
+#include "cinder/app/RendererGl.h"
+#include "cinder/gl/gl.h"
 
-#endif // FINAL_PROJECT_ASH_MAHERIYA_NEURAL_NETWORK_APP_H
+namespace neural_net {
+
+namespace visualizer {
+
+/**
+ * Displays a graph of a neural network
+ */
+class NeuralNetworkApp : public ci::app::App {
+ public:
+  NeuralNetworkApp();
+
+  void draw() override;
+
+  void keyDown(ci::app::KeyEvent event) override;
+
+  const double kWindowHeight = 1900;
+
+  const double kWindowWidth = 2500;
+
+  const double kMargin = 150;
+
+ private:
+  Network network_;
+};
+
+}  // namespace visualizer
+
+}  // namespace ideal_gas
