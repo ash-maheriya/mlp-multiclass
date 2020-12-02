@@ -30,7 +30,7 @@ class Layer {
 
   void CalculateErrors(std::vector<double> next_errors);
 
-  void CalculateOutputError(std::vector<size_t> labels);
+  void CalculateOutputError(size_t label);
 
   void UpdateValues();
 
@@ -38,7 +38,7 @@ class Layer {
 
   void CalculateAllGradients(size_t batch_size);
 
-  void UpdateWeights(std::vector<double> gradients, double learning_rate);
+  void UpdateWeights(double learning_rate);
 
   std::vector<double> GetErrors() const;
 

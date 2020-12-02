@@ -32,7 +32,7 @@ class Neuron {
 
   void CalculateGradient(size_t batch_size);
 
-  void GetGradient();
+  double GetGradient();
 
  private:
   /**

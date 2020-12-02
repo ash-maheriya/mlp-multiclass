@@ -2,6 +2,10 @@
 // Created by ash on 11/14/20.
 //
 #pragma once
+#include <stdio.h>
+
+#include <istream>
+
 #include "common_types.h"
 #include "layer.h"
 
@@ -23,11 +27,13 @@ class Network {
    */
   size_t GetNumHiddenLayers();
 
-  void BackPropagation(std::vector<size_t> labels);
+  void BackPropagation(size_t label);
 
-  void LoadImages();
+  friend std::istream& operator>>(std::istream& is, Network& network);  // loading images;
 
   double GetSparseCategoricalCrossEntropy(double output_activation, size_t ground_truth);
+
+  void LoadData(std::string& images_dir, std::string& labels_dir);
  private:
   const size_t kImageSize;
 
@@ -36,6 +42,6 @@ class Network {
   std::vector<Layer> layers_;
   double learning_rate_ = 0.1;
   std::vector<Image_t> images_;
-  std::vector<std::vector<size_t>> labels_;
+  std::vector<size_t> labels_;
 };
 } // namespace neural_net

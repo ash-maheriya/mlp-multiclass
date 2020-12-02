@@ -48,4 +48,7 @@ void Neuron::IncrementDelta(double next_error) {
 void Neuron::CalculateGradient(size_t batch_size) {
   gradient_ = delta_/(float)batch_size;
 }
+double Neuron::GetGradient() {
+  return gradient_;
+}
 }  // namespace neural_net

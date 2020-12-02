@@ -63,10 +63,8 @@ void Layer::CalculateErrors(std::vector<double> next_errors) {
 std::vector<Neuron> Layer::GetNeurons() const{
   return neurons_;
 }
-void Layer::CalculateOutputError(std::vector<size_t> labels) {
-  for (int i = 0; i < labels.size(); i++) {
-    neurons_[i].SetError(neurons_[i].GetActivation() - labels[i]);
-  }
+void Layer::CalculateOutputError(size_t label) {
+  neurons_[0].SetError(neurons_[0].GetActivation() - label);
   UpdateValues();
 }
 std::vector<double> Layer::GetErrors() const {
@@ -83,9 +81,11 @@ void Layer::CalculateAllGradients(size_t batch_size) {
     neuron.CalculateGradient(batch_size);
   }
 }
-void Layer::UpdateWeights(std::vector<double> gradients, double learning_rate) {
-  for (int i = 1; i < gradients.size(); i++) {
-
+void Layer::UpdateWeights(double learning_rate) {
+  for (size_t i = 1; i < weights_->size(); i++) {
+    for (size_t j = 0; j < weights_[i].size(); j++) {
+      weights_->at(i)[j] -= learning_rate * neurons_[i-1].GetGradient();
+    }
   }
 }
 
