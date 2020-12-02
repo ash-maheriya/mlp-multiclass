@@ -51,13 +51,15 @@ size_t Network::GetNumHiddenLayers() {
 
 void Network::Train() {
   for (int i = 0; i < images_.size(); i++) {
-
     layers_[1].ForwardPassHidden(&layers_[0], &layers_[2]);
     double cost = GetSparseCategoricalCrossEntropy(
         layers_[2].ForwardPassOutput(&layers_[1]), 1);
     BackPropagation(labels_[i]);
     layers_[num_hidden_layers_+1].CalculateAllGradients(images_.size());
     layers_[num_hidden_layers_].CalculateAllGradients(images_.size());
+  }
+  for (size_t i = 1; i < layers_.size(); i++) {
+    layers_[i].UpdateWeights();
   }
 }
 

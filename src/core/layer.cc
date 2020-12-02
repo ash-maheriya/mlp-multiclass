@@ -26,25 +26,15 @@ void Layer::UpdateValues() {
   }
 }
 void Layer::ForwardPassHidden(Layer* prev_layer, Layer* next_layer) {
-  vector<double> weights;
-  weights.push_back(1);
   for (size_t i = 0; i < neurons_.size(); i++) {
-    for (size_t j = 0; j < prev_layer->neurons_.size(); j++) {
-      weights.push_back(prev_layer->weights_->at(j).at(i));
-    }
-    neurons_[i].ForwardPass(weights, prev_layer->values_);
+    neurons_[i].ForwardPass(weights_->at(i+1), prev_layer->values_);
   }
   UpdateValues();
 }
 
 
 double Layer::ForwardPassOutput(Layer* prev_layer) {
-  vector<double> weights;
-  weights.push_back(1);
-  for (size_t j = 0; j < prev_layer->neurons_.size(); j++) {
-    weights.push_back(prev_layer->weights_->at(j).at(0));
-  }
-  double output = neurons_[0].ForwardPass(weights, prev_layer->values_);
+  double output = neurons_[0].ForwardPass(weights_->at(1), prev_layer->values_);
   UpdateValues();
   return output;
 }
