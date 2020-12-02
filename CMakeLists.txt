@@ -64,6 +64,13 @@ ci_make_app(
 )
 
 ci_make_app(
+        APP_NAME        neural-net-main
+        CINDER_PATH     ${CINDER_PATH}
+        SOURCES         apps/train_model_main.cc ${SOURCE_FILES}
+        INCLUDES        include
+)
+
+ci_make_app(
         APP_NAME        neural-net-test
         CINDER_PATH     ${CINDER_PATH}
         SOURCES         tests/test_main.cc ${SOURCE_FILES} ${TEST_FILES}
