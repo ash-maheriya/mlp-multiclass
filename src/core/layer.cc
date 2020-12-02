@@ -8,9 +8,11 @@ using std::vector;
 namespace neural_net {
 Layer::Layer(std::vector<std::vector<double>>* weights, bool is_input, bool is_output) : weights_(weights), is_input_layer_(is_input), is_output_layer_(is_output){
   values_.push_back(kBias);
+  errors_.push_back(1);
   for (size_t i = 0; i < weights_->size()-1; i++) {
     neurons_.push_back(Neuron());
     values_.push_back(0);
+    errors_.push_back(0);
   }
 }
 
@@ -20,30 +22,72 @@ double Layer::GetSize() const{
 void Layer::UpdateValues() {
   for (size_t i = 1; i < values_.size(); i++) {
     values_[i] = neurons_[i].GetActivation();
+    errors_[i] = neurons_[i].GetError();
   }
 }
 void Layer::ForwardPassHidden(Layer* prev_layer, Layer* next_layer) {
   vector<double> weights;
+  weights.push_back(1);
   for (size_t i = 0; i < neurons_.size(); i++) {
     for (size_t j = 0; j < prev_layer->neurons_.size(); j++) {
       weights.push_back(prev_layer->weights_->at(j).at(i));
     }
     neurons_[i].ForwardPass(weights, prev_layer->values_);
   }
+  UpdateValues();
 }
 
-void Layer::ForwardPassInput(Layer* next_layer) {
 
-}
-
-void Layer::ForwardPassOutput(Layer* prev_layer) {
+double Layer::ForwardPassOutput(Layer* prev_layer) {
   vector<double> weights;
-  for (size_t i = 0; i < neurons_.size(); i++) {
-    for (size_t j = 0; j < prev_layer->neurons_.size(); j++) {
-      weights.push_back(prev_layer->weights_->at(j).at(i));
+  weights.push_back(1);
+  for (size_t j = 0; j < prev_layer->neurons_.size(); j++) {
+    weights.push_back(prev_layer->weights_->at(j).at(0));
+  }
+  double output = neurons_[0].ForwardPass(weights, prev_layer->values_);
+  UpdateValues();
+  return output;
+}
+
+void Layer::CalculateErrors(std::vector<double> next_errors) {
+  double value;
+  for (size_t i = 1; i <= neurons_.size(); i++) {
+    value = 0;
+    for (size_t j = 0; j < weights_[i].size(); j++) {
+      value += weights_->at(i)[j] * next_errors[j];
     }
-    neurons_[i].ForwardPass(weights, prev_layer->values_);
+    neurons_[i].CalculateError(value);
+  }
+  UpdateValues();
+}
+std::vector<Neuron> Layer::GetNeurons() const{
+  return neurons_;
+}
+void Layer::CalculateOutputError(std::vector<size_t> labels) {
+  for (int i = 0; i < labels.size(); i++) {
+    neurons_[i].SetError(neurons_[i].GetActivation() - labels[i]);
+  }
+  UpdateValues();
+}
+std::vector<double> Layer::GetErrors() const {
+  return errors_;
+}
+
+void Layer::IncrementAllDeltas(std::vector<double> next_errors) {
+  for (size_t i = 0; i < neurons_.size(); i++) {
+    neurons_[i].IncrementDelta(next_errors[i]);
   }
 }
+void Layer::CalculateAllGradients(size_t batch_size) {
+  for (Neuron& neuron : neurons_) {
+    neuron.CalculateGradient(batch_size);
+  }
+}
+void Layer::UpdateWeights(std::vector<double> gradients, double learning_rate) {
+  for (int i = 1; i < gradients.size(); i++) {
+
+  }
+}
+
 }
 // namespace neural_net

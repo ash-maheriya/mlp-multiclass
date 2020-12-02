@@ -6,5 +6,6 @@
 
 namespace neural_net {
 typedef std::vector<std::vector<std::vector<double>>> Weight_Collection_t;
+typedef std::vector<std::vector<double>> Image_t;
 
 } // namespace neural_net

@@ -25,10 +25,27 @@ double Neuron::ForwardPass(const std::vector<double>& weights, const std::vector
 }
 
 double Neuron::Sigmoid(double value) {
-  activation_ = 1.0 / (1.0 + exp(value));
+  activation_ = 1.0 / (1.0 + exp(-1.0*value));
   return activation_;
 }
 double Neuron::GetActivation() {
   return activation_;
+}
+
+void Neuron::CalculateError(double prev_error) {
+  error_ = prev_error * activation_ * (1.0 - activation_);
+}
+double Neuron::GetError() {
+  return error_;
+}
+
+void Neuron::SetError(double error) {
+  error_ = error;
+}
+void Neuron::IncrementDelta(double next_error) {
+  delta_ += activation_*next_error;
+}
+void Neuron::CalculateGradient(size_t batch_size) {
+  gradient_ = delta_/(float)batch_size;
 }
 }  // namespace neural_net

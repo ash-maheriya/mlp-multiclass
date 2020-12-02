@@ -20,9 +20,7 @@ class Layer {
    */
   void ForwardPassHidden(Layer* prev_layer, Layer* next_layer);
 
-  void ForwardPassInput(Layer* next_layer);
-
-  void ForwardPassOutput(Layer* prev_layer);
+  double ForwardPassOutput(Layer* prev_layer);
 
   /**
    * Returns how many neurons are in the layer
@@ -30,7 +28,21 @@ class Layer {
    */
   double GetSize() const;
 
+  void CalculateErrors(std::vector<double> next_errors);
+
+  void CalculateOutputError(std::vector<size_t> labels);
+
   void UpdateValues();
+
+  void IncrementAllDeltas(std::vector<double> next_errors);
+
+  void CalculateAllGradients(size_t batch_size);
+
+  void UpdateWeights(std::vector<double> gradients, double learning_rate);
+
+  std::vector<double> GetErrors() const;
+
+  std::vector<Neuron> GetNeurons() const;
 
  private:
   const double kBias = 1;
@@ -38,6 +50,7 @@ class Layer {
   std::vector<Neuron> neurons_;
   std::vector<std::vector<double>>* weights_;
   std::vector<double> values_;
+  std::vector<double> errors_;
 
   bool is_input_layer_ = false;
   bool is_output_layer_ = false;
