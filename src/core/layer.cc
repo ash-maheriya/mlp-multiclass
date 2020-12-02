@@ -3,13 +3,22 @@
 //
 
 #include "core/layer.h"
+
+#include <iostream>
 #include <vector>
 using std::vector;
 namespace neural_net {
-Layer::Layer(std::vector<std::vector<double>>* weights, bool is_input, bool is_output) : weights_(weights), is_input_layer_(is_input), is_output_layer_(is_output){
+Layer::Layer(vector<vector<double>> weights) : weights_(weights){
   values_.push_back(kBias);
   errors_.push_back(1);
-  for (size_t i = 0; i < weights_->size()-1; i++) {
+  if (weights_.size() == 0) {
+    for (size_t j = 0; j < 28*28; j++) {
+      neurons_.push_back(Neuron());
+      values_.push_back(0);
+      errors_.push_back(0);
+    }
+  }
+  for (size_t i = 0; i < weights_.size(); i++) {
     neurons_.push_back(Neuron());
     values_.push_back(0);
     errors_.push_back(0);
@@ -25,26 +34,26 @@ void Layer::UpdateValues() {
     errors_[i] = neurons_[i].GetError();
   }
 }
-void Layer::ForwardPassHidden(Layer* prev_layer, Layer* next_layer) {
+void Layer::ForwardPassHidden(Layer& prev_layer) {
   for (size_t i = 0; i < neurons_.size(); i++) {
-    neurons_[i].ForwardPass(weights_->at(i+1), prev_layer->values_);
+    neurons_[i].ForwardPass(weights_[i], prev_layer.values_);
   }
   UpdateValues();
 }
 
 
-double Layer::ForwardPassOutput(Layer* prev_layer) {
-  double output = neurons_[0].ForwardPass(weights_->at(1), prev_layer->values_);
+double Layer::ForwardPassOutput(Layer& prev_layer) {
+  double output = neurons_[0].ForwardPass(weights_[0], prev_layer.values_);
   UpdateValues();
   return output;
 }
 
 void Layer::CalculateErrors(std::vector<double> next_errors) {
   double value;
-  for (size_t i = 1; i <= neurons_.size(); i++) {
+  for (size_t i = 0; i <= neurons_.size(); i++) {
     value = 0;
-    for (size_t j = 0; j < weights_[i].size(); j++) {
-      value += weights_->at(i)[j] * next_errors[j];
+    for (size_t j = 1; j < weights_[i].size(); j++) {
+      value += weights_[i][j] * next_errors[j];
     }
     neurons_[i].CalculateError(value);
   }
@@ -72,11 +81,25 @@ void Layer::CalculateAllGradients(size_t batch_size) {
   }
 }
 void Layer::UpdateWeights(double learning_rate) {
-  for (size_t i = 1; i < weights_->size(); i++) {
+  for (size_t i = 1; i < weights_.size(); i++) {
     for (size_t j = 0; j < weights_[i].size(); j++) {
-      weights_->at(i)[j] -= learning_rate * neurons_[i-1].GetGradient();
+      weights_[i][j] -= learning_rate * neurons_[i-1].GetGradient();
     }
   }
+}
+
+void Layer::LoadInputActivations(const Image_t& img) {
+  size_t index = 0;
+  for (size_t row = 0; row < img.size(); row++) {
+    for (size_t col = 0; col < img[row].size(); col++) {
+      if (img[row][col] != 0) {
+        std::cout << "Wow!" << std::endl;
+      }
+      neurons_[index].SetActivation(img[row][col]);
+      index++;
+    }
+  }
+  UpdateValues();
 }
 
 }

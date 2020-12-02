@@ -5,22 +5,25 @@
 
 #include <vector>
 #include "neuron.h"
+#include "common_types.h"
 namespace neural_net {
 /**
  * The layers that comprise the network
  */
 class Layer {
  public:
-  Layer(std::vector<std::vector<double>>* weights, bool is_input, bool is_output);
+  Layer(std::vector<std::vector<double>> weights);
 
   /**
    * Runs the forward pass of every neuron in the layer and passes the values
    * onto the next layer in the network
    * @param next_layer
    */
-  void ForwardPassHidden(Layer* prev_layer, Layer* next_layer);
+  void ForwardPassHidden(Layer& prev_layer);
 
-  double ForwardPassOutput(Layer* prev_layer);
+  void LoadInputActivations(const Image_t& img);
+
+  double ForwardPassOutput(Layer& prev_layer);
 
   /**
    * Returns how many neurons are in the layer
@@ -48,11 +51,8 @@ class Layer {
   const double kBias = 1;
 
   std::vector<Neuron> neurons_;
-  std::vector<std::vector<double>>* weights_;
+  std::vector<std::vector<double>> weights_;
   std::vector<double> values_;
   std::vector<double> errors_;
-
-  bool is_input_layer_ = false;
-  bool is_output_layer_ = false;
 };
 }

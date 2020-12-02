@@ -51,4 +51,7 @@ void Neuron::CalculateGradient(size_t batch_size) {
 double Neuron::GetGradient() {
   return gradient_;
 }
+void Neuron::SetActivation(double activation) {
+  activation_ = activation;
+}
 }  // namespace neural_net

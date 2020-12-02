@@ -24,8 +24,8 @@ Network::Network(size_t image_size) : kImageSize(image_size){
   // Initializing and randomizing the weights
   weights_ = Weight_Collection_t(num_hidden_layers_+2);
   std::cout << weights_.size();
-  weights_[1] = vector<vector<double>>(kImageSize*kImageSize + 1, vector<double>(10)); // input layer for 28*28 images
-  weights_[2] = vector<vector<double>>(256, vector<double>(1)); // first hidden layer
+  weights_[1] = vector<vector<double>>(256, vector<double>(28*28+1)); // input layer for 28*28 images
+  weights_[2] = vector<vector<double>>(1, vector<double>(257)); // first hidden layer
 //  weights_[2] = vector<vector<double>>(10 + 1, vector<double>(10)); // second hidden layer
 //  weights_[3] = vector<vector<double>>(10 + 1, vector<double>(10)); // output layer
   for (size_t layer = 1; layer < num_hidden_layers_+2; layer++) {
@@ -38,11 +38,11 @@ Network::Network(size_t image_size) : kImageSize(image_size){
   }
 
   // Creating the layers
-  layers_.push_back(Layer(&weights_[0], true, false));
+  layers_.push_back(Layer(vector<vector<double>>(0)));
   for (size_t i = 1; i < num_hidden_layers_+1; i++) {
-    layers_.push_back(Layer(&weights_[i], false, false));
+    layers_.push_back(Layer(weights_[i]));
   }
-  layers_.push_back(Layer(&weights_[weights_.size()-1], false, true));
+  layers_.push_back(Layer(weights_[weights_.size()-1]));
 }
 
 size_t Network::GetNumHiddenLayers() {
@@ -50,16 +50,18 @@ size_t Network::GetNumHiddenLayers() {
 }
 
 void Network::Train() {
-  for (int i = 0; i < images_.size(); i++) {
-    layers_[1].ForwardPassHidden(&layers_[0], &layers_[2]);
-    double cost = GetSparseCategoricalCrossEntropy(
-        layers_[2].ForwardPassOutput(&layers_[1]), 1);
+  for (size_t i = 0; i < images_.size(); i++) {
+    layers_[0].LoadInputActivations(images_[i]);
+    layers_[1].ForwardPassHidden(layers_[0]);
+    //double cost = GetSparseCategoricalCrossEntropy(
+    //    layers_[2].ForwardPassOutput(&layers_[1]), 1);
+    layers_[2].ForwardPassOutput(layers_[1]);
     BackPropagation(labels_[i]);
     layers_[num_hidden_layers_+1].CalculateAllGradients(images_.size());
     layers_[num_hidden_layers_].CalculateAllGradients(images_.size());
   }
   for (size_t i = 1; i < layers_.size(); i++) {
-    layers_[i].UpdateWeights();
+    layers_[i].UpdateWeights(learning_rate_);
   }
 }
 
@@ -97,7 +99,7 @@ void Network::LoadData(std::string& images_dir, std::string& labels_dir) {
       for (size_t row = 0; row < 28; row++) {
         for (size_t col = 0; col < 28; col++) {
           while (training_images.read(reinterpret_cast<char*>(&pixel), sizeof(pixel))) {
-            img[row][col] = pixel;
+            img[row][col] = pixel/255.0;
           }
         }
       }

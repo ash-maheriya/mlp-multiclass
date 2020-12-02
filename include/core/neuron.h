@@ -34,6 +34,8 @@ class Neuron {
 
   double GetGradient();
 
+  void SetActivation(double activation);
+
  private:
   /**
    * Sigmoid activation function maps the given value on the sigmoid graph
