@@ -43,5 +43,6 @@ class Network {
   float learning_rate_ = 0.1;
   std::vector<Image_t> images_;
   std::vector<size_t> labels_;
+  size_t batch_size = 256;
 };
 } // namespace neural_net

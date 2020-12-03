@@ -33,7 +33,8 @@ Network::Network(size_t image_size) : kImageSize(image_size){
     for (size_t i = 0; i < weights_[layer].size(); i++) {
       weights_[layer][i][0] = 1;
       for (size_t j = 1; j < weights_[layer][i].size(); j++) {
-        weights_[layer][i][j] = rand() % 10;
+        //weights_[layer][i][j] = rand() % 10;
+        weights_[layer][i][j] = static_cast <float> (rand()) / static_cast <float> (RAND_MAX);
       }
     }
   }
@@ -60,16 +61,12 @@ void Network::Train() {
     //float cost = GetSparseCategoricalCrossEntropy(
     //    layers_[2].ForwardPassOutput(&layers_[1]), 1);
     layers_[2].ForwardPassOutput(layers_[1]);
-//    std::cout << "Forward pass complete" << std::endl;
     BackPropagation(labels_[i]);
-//    std::cout << "Backpropagation complete" << std::endl;
     layers_[num_hidden_layers_+1].CalculateAllGradients(images_.size());
     layers_[num_hidden_layers_].CalculateAllGradients(images_.size());
-//    std::cout << "Gradients calculated" << std::endl;
   }
   for (size_t i = 1; i < layers_.size(); i++) {
     layers_[i].UpdateWeights(learning_rate_);
-//    std::cout << "Weight updated" << std::endl;
   }
 }
 
