@@ -18,7 +18,7 @@ void NeuralNetworkApp::draw() {
       "This is a visual representation of the layers of the neural network.",
       glm::vec2(kWindowWidth / 2, kMargin / 2), ci::Color("white"), font);
   ci::gl::drawStringCentered(
-      "Number of hidden layers: " + std::to_string(network_.GetNumHiddenLayers()),
+      "Number of layers: " + std::to_string(visualization_.GetNumberOfNetworkLayers()),
       glm::vec2(kWindowWidth / 2, kMargin), ci::Color("white"), font);
 }
 

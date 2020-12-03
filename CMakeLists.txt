@@ -50,6 +50,7 @@ include("${CINDER_PATH}/proj/cmake/modules/cinderMakeApp.cmake")
 
 list(APPEND SOURCE_FILES    ${CORE_SOURCE_FILES}
         src/visualizer/neural_network_app.cc
+        src/visualizer/network_visualization.cc
         src/core/network.cc
         src/core/neuron.cc
         src/core/layer.cc)

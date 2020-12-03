@@ -46,7 +46,7 @@ Network::Network(size_t image_size) : kImageSize(image_size) {
       weights_[layer][i][0] = 0;  // TODO: Randomize this (will serve as bias)
       for (size_t j = 1; j < weights_[layer][i].size(); j++) {
         weights_[layer][i][j] =
-            static_cast<float>(rand()) / static_cast<float>(RAND_MAX) - 0.5; // TODO: RANDOMIZE WEIGHTS FROM -x to x where x is pretty small
+            static_cast<float>(rand()) / static_cast<float>(RAND_MAX) - 0.5;
       }
     }
   }

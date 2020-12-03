@@ -1,11 +1,12 @@
 #pragma once
 
 #include <core/network.h>
-#include <time.h>
+#include <visualizer/network_visualization.h>
 
 #include "cinder/app/App.h"
 #include "cinder/app/RendererGl.h"
 #include "cinder/gl/gl.h"
+
 
 namespace neural_net {
 
@@ -33,6 +34,7 @@ class NeuralNetworkApp : public ci::app::App {
  private:
 
   Network network_ = Network(kImageSize);
+  NetworkVisualization visualization_;
 };
 
 }  // namespace visualizer
