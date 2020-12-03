@@ -21,19 +21,21 @@ class NetworkVisualization {
   const size_t kImageSize = 28;
 
  private:
-  void DrawInputLayer();
+  void PlotInputLayer();
 
-  void DrawHiddenLayer();
+  void PlotHiddenLayer();
 
-  void DrawOutputLayer();
+  void PlotOutputLayer();
 
-  void DrawWeights();
+  void DrawNetwork();
 
   const float kWindowHeight;
 
   const float kWindowWidth;
 
   const float kMargin;
+
+  std::vector<size_t> neuron_sizes;
 
   Network network_ = Network(kImageSize);
 
