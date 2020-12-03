@@ -66,7 +66,10 @@ size_t Network::GetNumHiddenLayers() {
 void Network::Train() {
   std::cout << "Number of images: " << images_.size() << std::endl;
   std::cout << "Number of labels: " << labels_.size() << std::endl;
-  // for (size_t i = 0; i < images_.size(); i++) {
+  if (images_.empty() || labels_.empty()) {
+    throw std::invalid_argument("Must load data before training");
+  }
+
   size_t image_index = 0;
   for (size_t i = 0; i < batch_size / batch_size; i++) {
     layers_[1].ResetAllDeltas();
