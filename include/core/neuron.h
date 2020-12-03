@@ -36,6 +36,8 @@ class Neuron {
 
   void SetActivation(float activation);
 
+  void ResetDelta();
+
  private:
   /**
    * Sigmoid activation function maps the given value on the sigmoid graph

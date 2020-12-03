@@ -55,19 +55,29 @@ void Network::Train() {
   std::cout << "Number of images: "  << images_.size() << std::endl;
   std::cout << "Number of labels: " << labels_.size() << std::endl;
   //for (size_t i = 0; i < images_.size(); i++) {
-  for (size_t i = 0; i < 50; i++) {
-    layers_[0].LoadInputActivations(images_[i]);
-    layers_[1].ForwardPassHidden(layers_[0]);
-    //float cost = GetSparseCategoricalCrossEntropy(
-    //    layers_[2].ForwardPassOutput(&layers_[1]), 1);
-    layers_[2].ForwardPassOutput(layers_[1]);
-    BackPropagation(labels_[i]);
-    layers_[num_hidden_layers_+1].CalculateAllGradients(images_.size());
-    layers_[num_hidden_layers_].CalculateAllGradients(images_.size());
+  size_t image_index = 0;
+  for (size_t i = 0; i < 1000/batch_size; i++) {
+    layers_[1].ResetAllDeltas();
+    layers_[2].ResetAllDeltas();
+    for (size_t j = 0; j < batch_size; j++) {
+      if (image_index > images_.size()) {
+        continue;
+      }
+      layers_[0].LoadInputActivations(images_[image_index]);
+      layers_[1].ForwardPassHidden(layers_[0]);
+      //float cost = GetSparseCategoricalCrossEntropy(
+      //    layers_[2].ForwardPassOutput(&layers_[1]), 1);
+      layers_[2].ForwardPassOutput(layers_[1]);
+      BackPropagation(labels_[image_index]);
+      layers_[num_hidden_layers_+1].CalculateAllGradients(images_.size());
+      layers_[num_hidden_layers_].CalculateAllGradients(images_.size());
+      image_index++;
+    }
+    for (size_t k = 1; k < layers_.size(); k++) {
+      layers_[i].UpdateWeights(learning_rate_);
   }
-  for (size_t i = 1; i < layers_.size(); i++) {
-    layers_[i].UpdateWeights(learning_rate_);
   }
+
 }
 
 float Network::GetSparseCategoricalCrossEntropy(float output_activation, size_t ground_truth) {

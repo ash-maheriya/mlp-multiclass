@@ -54,4 +54,7 @@ float Neuron::GetGradient() {
 void Neuron::SetActivation(float activation) {
   activation_ = activation;
 }
+void Neuron::ResetDelta() {
+  delta_ = 0;
+}
 }  // namespace neural_net

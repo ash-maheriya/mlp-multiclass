@@ -47,6 +47,8 @@ class Layer {
 
   std::vector<Neuron> GetNeurons() const;
 
+  void ResetAllDeltas();
+
  private:
   const float kBias = 1;
 

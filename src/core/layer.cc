@@ -98,6 +98,11 @@ void Layer::LoadInputActivations(const Image_t& img) {
   }
   UpdateValues();
 }
+void Layer::ResetAllDeltas() {
+  for (Neuron& neuron : neurons_) {
+    neuron.ResetDelta();
+  }
+}
 
 }
 // namespace neural_net
