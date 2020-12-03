@@ -22,9 +22,9 @@ NetworkVisualization::NetworkVisualization(double height, double width,
   network_.LoadData(img_dir, lbl_dir);
   network_.Train();
 
-  neuron_sizes.push_back(1);
-  neuron_sizes.push_back(4);
-  neuron_sizes.push_back(10);
+  neuron_sizes.push_back(1);  // input neuron size
+  neuron_sizes.push_back(10);  // hidden neuron size
+  neuron_sizes.push_back(20); // output neuron size
 }
 
 size_t
@@ -74,7 +74,7 @@ void NetworkVisualization::DrawNetwork() {
   for (size_t layer = 1; layer < network_.GetNumHiddenLayers()+2; layer++) {
     for (const vec2& first_position : neuron_positions_[layer]) {
       for (const vec2& second_position : neuron_positions_[layer-1]) {
-        ci::gl::color(ci::Color("grey"));
+        ci::gl::color(ci::Color("gray"));
         ci::gl::drawLine(first_position, second_position);
         ci::gl::color(ci::Color("red"));
         ci::gl::drawSolidCircle(first_position, neuron_sizes[layer]);
