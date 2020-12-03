@@ -35,14 +35,15 @@ class Network {
 
   void LoadData(std::string& images_dir, std::string& labels_dir);
  private:
+  const size_t kPositiveClass = 4;
   const size_t kImageSize;
 
   Weight_Collection_t weights_;
   size_t num_hidden_layers_ = 1;
   std::vector<Layer> layers_;
-  float learning_rate_ = 0.1;
+  float learning_rate_ = 0.001;
   std::vector<Image_t> images_;
   std::vector<size_t> labels_;
-  size_t batch_size = 256;
+  size_t batch_size = 100;
 };
 } // namespace neural_net

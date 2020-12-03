@@ -7,6 +7,7 @@
 #include <math.h>
 #include <stdio.h>
 
+#include <iostream>
 #include <stdexcept>
 #include <vector>
 
@@ -21,12 +22,12 @@ float Neuron::ForwardPass(const std::vector<float>& weights, const std::vector<f
   for (size_t i = 0; i < weights.size(); i++) {
     value += weights[i] * values[i];
   }
+  activation_ = Sigmoid(value);
   return Sigmoid(value);
 }
 
 float Neuron::Sigmoid(float value) {
-  activation_ = 1.0 / (1.0 + exp(-1.0*value));
-  return activation_;
+  return 1.0 / (1.0 + exp(-1.0*value));
 }
 float Neuron::GetActivation() {
   return activation_;

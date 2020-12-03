@@ -49,6 +49,8 @@ class Layer {
 
   void ResetAllDeltas();
 
+  void PrintActivations();
+
  private:
   const float kBias = 1;
 
