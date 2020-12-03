@@ -4,6 +4,7 @@
 #pragma once
 
 #include "core/network.h"
+#include "cinder/gl/gl.h"
 
 namespace neural_net {
 
@@ -26,6 +27,8 @@ class NetworkVisualization {
 
   void DrawOutputLayer();
 
+  void DrawWeights();
+
   const float kWindowHeight;
 
   const float kWindowWidth;
@@ -33,6 +36,8 @@ class NetworkVisualization {
   const float kMargin;
 
   Network network_ = Network(kImageSize);
+
+  std::vector<std::vector<glm::vec2>> neuron_positions_;
 };
 }  // namespace visualizer
 }  // namespace neural_net
