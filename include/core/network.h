@@ -34,6 +34,8 @@ class Network {
   float GetSparseCategoricalCrossEntropy(float output_activation, size_t ground_truth);
 
   void LoadData(std::string& images_dir, std::string& labels_dir);
+
+  std::vector<Layer> GetLayers();
  private:
   const size_t kPositiveClass = 4;
   const size_t kImageSize;
@@ -45,5 +47,6 @@ class Network {
   std::vector<Image_t> images_;
   std::vector<size_t> labels_;
   size_t batch_size = 100;
+  size_t hidden_layer_size = 64;
 };
 } // namespace neural_net

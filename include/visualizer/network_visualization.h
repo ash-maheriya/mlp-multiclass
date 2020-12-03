@@ -11,14 +11,28 @@ namespace visualizer {
 
 class NetworkVisualization {
  public:
-  NetworkVisualization();
+  NetworkVisualization(double height, double width, double margin);
 
   void Draw();
 
   size_t GetNumberOfNetworkLayers();
 
+  const size_t kImageSize = 28;
+
  private:
-  Network network_ = Network(28);
+  void DrawInputLayer();
+
+  void DrawHiddenLayer();
+
+  void DrawOutputLayer();
+
+  const float kWindowHeight;
+
+  const float kWindowWidth;
+
+  const float kMargin;
+
+  Network network_ = Network(kImageSize);
 };
 }  // namespace visualizer
 }  // namespace neural_net

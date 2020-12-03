@@ -35,9 +35,9 @@ Network::Network(size_t image_size) : kImageSize(image_size) {
   weights_ = Weight_Collection_t(num_hidden_layers_ + 2);
   std::cout << weights_.size();
   weights_[1] = vector<vector<float>>(
-      256, vector<float>(28 * 28 + 1));  // input layer for 28*28 images
+      hidden_layer_size, vector<float>(kImageSize * kImageSize + 1));  // input layer for 28*28 images
   weights_[2] =
-      vector<vector<float>>(1, vector<float>(257));  // first hidden layer
+      vector<vector<float>>(1, vector<float>(hidden_layer_size+1));  // first hidden layer
   //  weights_[2] = vector<vector<float>>(10 + 1, vector<float>(10)); // second
   //  hidden layer weights_[3] = vector<vector<float>>(10 + 1,
   //  vector<float>(10)); // output layer
@@ -182,6 +182,9 @@ void Network::LoadData(std::string& images_dir, std::string& labels_dir) {
 // loading images
 std::istream& operator>>(std::istream& is, Network& network) {
   return is;
+}
+std::vector<Layer> Network::GetLayers() {
+  return layers_;
 }
 
 }  // namespace neural_net
