@@ -12,8 +12,8 @@
 
 namespace neural_net {
 
-double Neuron::ForwardPass(const std::vector<double>& weights, const std::vector<double>& values) {
-  double value = 0;
+float Neuron::ForwardPass(const std::vector<float>& weights, const std::vector<float>& values) {
+  float value = 0;
   if (weights.size() != values.size()) {
     throw std::invalid_argument(
         "Must have the same number of weights and values");
@@ -24,34 +24,34 @@ double Neuron::ForwardPass(const std::vector<double>& weights, const std::vector
   return Sigmoid(value);
 }
 
-double Neuron::Sigmoid(double value) {
+float Neuron::Sigmoid(float value) {
   activation_ = 1.0 / (1.0 + exp(-1.0*value));
   return activation_;
 }
-double Neuron::GetActivation() {
+float Neuron::GetActivation() {
   return activation_;
 }
 
-void Neuron::CalculateError(double prev_error) {
+void Neuron::CalculateError(float prev_error) {
   error_ = prev_error * activation_ * (1.0 - activation_);
 }
-double Neuron::GetError() {
+float Neuron::GetError() {
   return error_;
 }
 
-void Neuron::SetError(double error) {
+void Neuron::SetError(float error) {
   error_ = error;
 }
-void Neuron::IncrementDelta(double next_error) {
+void Neuron::IncrementDelta(float next_error) {
   delta_ += activation_*next_error;
 }
 void Neuron::CalculateGradient(size_t batch_size) {
   gradient_ = delta_/(float)batch_size;
 }
-double Neuron::GetGradient() {
+float Neuron::GetGradient() {
   return gradient_;
 }
-void Neuron::SetActivation(double activation) {
+void Neuron::SetActivation(float activation) {
   activation_ = activation;
 }
 }  // namespace neural_net

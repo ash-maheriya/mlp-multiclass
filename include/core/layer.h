@@ -12,7 +12,7 @@ namespace neural_net {
  */
 class Layer {
  public:
-  Layer(std::vector<std::vector<double>> weights);
+  Layer(std::vector<std::vector<float>> weights);
 
   /**
    * Runs the forward pass of every neuron in the layer and passes the values
@@ -23,36 +23,36 @@ class Layer {
 
   void LoadInputActivations(const Image_t& img);
 
-  double ForwardPassOutput(Layer& prev_layer);
+  float ForwardPassOutput(Layer& prev_layer);
 
   /**
    * Returns how many neurons are in the layer
    * @return how many neurons are in the layer
    */
-  double GetSize() const;
+  float GetSize() const;
 
-  void CalculateErrors(std::vector<double> next_errors);
+  void CalculateErrors(std::vector<float> next_errors);
 
   void CalculateOutputError(size_t label);
 
   void UpdateValues();
 
-  void IncrementAllDeltas(std::vector<double> next_errors);
+  void IncrementAllDeltas(std::vector<float> next_errors);
 
   void CalculateAllGradients(size_t batch_size);
 
-  void UpdateWeights(double learning_rate);
+  void UpdateWeights(float learning_rate);
 
-  std::vector<double> GetErrors() const;
+  std::vector<float> GetErrors() const;
 
   std::vector<Neuron> GetNeurons() const;
 
  private:
-  const double kBias = 1;
+  const float kBias = 1;
 
   std::vector<Neuron> neurons_;
-  std::vector<std::vector<double>> weights_;
-  std::vector<double> values_;
-  std::vector<double> errors_;
+  std::vector<std::vector<float>> weights_;
+  std::vector<float> values_;
+  std::vector<float> errors_;
 };
 }

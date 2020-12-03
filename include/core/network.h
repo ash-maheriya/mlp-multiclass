@@ -31,7 +31,7 @@ class Network {
 
   friend std::istream& operator>>(std::istream& is, Network& network);  // loading images;
 
-  double GetSparseCategoricalCrossEntropy(double output_activation, size_t ground_truth);
+  float GetSparseCategoricalCrossEntropy(float output_activation, size_t ground_truth);
 
   void LoadData(std::string& images_dir, std::string& labels_dir);
  private:
@@ -40,7 +40,7 @@ class Network {
   Weight_Collection_t weights_;
   size_t num_hidden_layers_ = 1;
   std::vector<Layer> layers_;
-  double learning_rate_ = 0.1;
+  float learning_rate_ = 0.1;
   std::vector<Image_t> images_;
   std::vector<size_t> labels_;
 };
