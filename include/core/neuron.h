@@ -18,9 +18,25 @@ class Neuron {
    * @param values the activation values from the previous layer
    * @return the calculated activation value of the neuron
    */
-  double ForwardPass(const std::vector<double>& weights, const std::vector<double>& values);
+  float ForwardPass(const std::vector<float>& weights, const std::vector<float>& values);
 
-  double GetActivation();
+  float GetActivation();
+
+  void CalculateError(float prev_error);
+
+  float GetError();
+
+  void SetError(float error);
+
+  void IncrementDelta(float next_error);
+
+  void CalculateGradient(size_t batch_size);
+
+  float GetGradient();
+
+  void SetActivation(float activation);
+
+  void ResetDelta();
 
  private:
   /**
@@ -28,7 +44,10 @@ class Neuron {
    * @param value value to be mapped
    * @return the adjusted value
    */
-  double Sigmoid(double value);
-  double activation_ = 0;
+  float Sigmoid(float value);
+  float activation_ = 0;
+  float error_;
+  float delta_;
+  float gradient_;
 };
 } // namespace neural_net

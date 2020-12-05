@@ -4,46 +4,187 @@
 
 #include "../../include/core/network.h"
 
+#include <tgmath.h>
+
+#include <cstring>
+#include <fstream>
 #include <iostream>
+
+#include "dirent.h"
+using std::ifstream;
+using std::istream;
 using std::vector;
 namespace neural_net {
 
-Network::Network(size_t image_size) : kImageSize(image_size){
+void PrintImage(Image_t img){
+  for (size_t i = 0; i < img.size(); i++) {
+    for (size_t j = 0; j < img[i].size(); j++) {
+      printf("%8.6f ", img[i][j]);
+    }
+    printf("\n");
+  }
+}
+
+Network::Network(size_t image_size) : kImageSize(image_size) {
   // Creating a new random seed the program is run
   time_t seconds;
   seconds = time(nullptr);
   srand(static_cast<int>(seconds));
 
   // Initializing and randomizing the weights
-  weights_ = Weight_Collection_t(num_hidden_layers_+2);
+  weights_ = Weight_Collection_t(num_hidden_layers_ + 2);
   std::cout << weights_.size();
-  weights_[0] = vector<vector<double>>(28*28 + 1, vector<double>(10)); // input layer for 28*28 images
-  weights_[1] = vector<vector<double>>(10 + 1, vector<double>(10)); // first hidden layer
-  weights_[2] = vector<vector<double>>(10 + 1, vector<double>(10)); // second hidden layer
-  weights_[3] = vector<vector<double>>(10 + 1, vector<double>(10)); // output layer
-  for (size_t layer = 0; layer < num_hidden_layers_+2; layer++) {
+  weights_[1] = vector<vector<float>>(
+      hidden_layer_size, vector<float>(kImageSize * kImageSize + 1));  // input layer for 28*28 images
+  weights_[2] =
+      vector<vector<float>>(1, vector<float>(hidden_layer_size+1));  // first hidden layer
+  //  weights_[2] = vector<vector<float>>(10 + 1, vector<float>(10)); // second
+  //  hidden layer weights_[3] = vector<vector<float>>(10 + 1,
+  //  vector<float>(10)); // output layer
+  for (size_t layer = 1; layer < num_hidden_layers_ + 2; layer++) {
     for (size_t i = 0; i < weights_[layer].size(); i++) {
-      weights_[layer][i][0] = 1;
+      weights_[layer][i][0] = 0;  // TODO: Randomize this (will serve as bias)
       for (size_t j = 1; j < weights_[layer][i].size(); j++) {
-        weights_[layer][i][j] = rand() % 10;
+        weights_[layer][i][j] =
+            static_cast<float>(rand()) / static_cast<float>(RAND_MAX) - 0.5;
       }
     }
   }
 
   // Creating the layers
-  layers_.push_back(Layer(&weights_[0], true, false));
-  for (size_t i = 1; i < num_hidden_layers_+1; i++) {
-    layers_.push_back(Layer(&weights_[i], false, false));
+  layers_.push_back(Layer(vector<vector<float>>(0)));
+  for (size_t i = 1; i < num_hidden_layers_ + 1; i++) {
+    layers_.push_back(Layer(weights_[i]));
   }
-  layers_.push_back(Layer(&weights_[weights_.size()-1], false, true));
+  layers_.push_back(Layer(weights_[weights_.size() - 1]));
 }
+
 size_t Network::GetNumHiddenLayers() {
   return num_hidden_layers_;
 }
-void Network::ForwardPass() {
-  layers_[0].ForwardPassInput(&layers_[1]);
-  layers_[1].ForwardPassHidden(&layers_[0], &layers_[2]);
-  layers_[2].ForwardPassHidden(&layers_[1], &layers_[3]);
-  layers_[3].ForwardPassOutput(&layers_[2]);
+
+void Network::Train() {
+  std::cout << "Number of images: " << images_.size() << std::endl;
+  std::cout << "Number of labels: " << labels_.size() << std::endl;
+  if (images_.empty() || labels_.empty()) {
+    throw std::invalid_argument("Must load data before training");
+  }
+
+  size_t image_index = 0;
+  for (size_t i = 0; i < batch_size / batch_size; i++) {
+    layers_[1].ResetAllDeltas();
+    layers_[2].ResetAllDeltas();
+    for (size_t j = 0; j < batch_size; j++) {
+      if (image_index > images_.size()) {
+        continue;
+      }
+
+      layers_[0].LoadInputActivations(images_[image_index]);
+      layers_[1].ForwardPassHidden(layers_[0]);
+      float output = layers_[2].ForwardPassOutput(layers_[1]);
+      float cost =
+          GetSparseCategoricalCrossEntropy(output, labels_[image_index]);
+      std::cout << "Label: " << labels_[image_index] << ", Output: " << output
+                << ", Cost: " << cost << std::endl;
+      // layers_[2].ForwardPassOutput(layers_[1]);
+      BackPropagation(labels_[image_index]);
+      layers_[num_hidden_layers_ + 1].CalculateAllGradients(images_.size());
+      layers_[num_hidden_layers_].CalculateAllGradients(images_.size());
+      image_index++;
+    }
+    for (size_t k = 1; k < layers_.size(); k++) {
+      layers_[k].UpdateWeights(learning_rate_);
+    }
+    std::cout << "Batch complete" << std::endl;
+  }
 }
-} // namespace neural_net
+
+// loss/cost function
+float Network::GetSparseCategoricalCrossEntropy(float output_activation,
+                                                size_t ground_truth) {
+  if (ground_truth == 1) {
+    return -1.0 * (log(output_activation));
+  } else {
+    return -1.0 * (log(1.0 - output_activation));
+  }
+}
+
+void Network::BackPropagation(size_t label) {
+  layers_[num_hidden_layers_ + 1].CalculateOutputError(label);
+  layers_[num_hidden_layers_].CalculateErrors(
+      layers_[num_hidden_layers_ + 1].GetErrors());
+  layers_[num_hidden_layers_ + 1].IncrementAllDeltas(
+      layers_[num_hidden_layers_ + 1].GetErrors());
+  layers_[num_hidden_layers_].IncrementAllDeltas(
+      layers_[num_hidden_layers_ + 1].GetErrors());
+}
+
+void Network::LoadData(std::string& images_dir, std::string& labels_dir) {
+  images_.clear();
+  labels_.clear();
+  // code for iterating over directory from:
+  // https://stackoverflow.com/questions/612097/how-can-i-get-the-list-of-files-in-a-directory-using-c-or-c
+  DIR* img_dir;
+  struct dirent* img_ent;
+  size_t img_count = 0;
+  if ((img_dir = opendir(images_dir.c_str())) != NULL) {
+    while ((img_ent = readdir(img_dir)) != NULL) {
+      std::string f_name = img_ent->d_name;
+      if (!strcmp(f_name.c_str(), ".") || !strcmp(f_name.c_str(), "..")) {
+        continue;
+      }
+      std::string img_file = images_dir + f_name;
+      ifstream training_images;
+      training_images.open(img_file, ifstream::in);
+      float pixel;
+      Image_t img =
+          vector<vector<float>>(kImageSize, vector<float>(kImageSize));
+      for (size_t row = 0; row < 28; row++) {
+        for (size_t col = 0; col < 28; col++) {
+          if (training_images.read(reinterpret_cast<char*>(&pixel),
+                                   sizeof(pixel))) {
+            img[row][col] = pixel;
+          }
+        }
+      }
+      //PrintImage(img);
+      images_.push_back(img);
+      img_count++;
+    }
+  }
+
+  DIR* lbl_dir;
+  struct dirent* lbl_ent;
+  size_t lbl_count = 0;
+  if ((lbl_dir = opendir(labels_dir.c_str())) != NULL) {
+    while ((lbl_ent = readdir(lbl_dir)) != NULL) {
+      std::string f_name = lbl_ent->d_name;
+      if (!strcmp(f_name.c_str(), ".") || !strcmp(f_name.c_str(), "..")) {
+        continue;
+      }
+      std::string lbl_file = labels_dir + f_name;
+      ifstream training_labels;
+      training_labels.open(lbl_file, ifstream::in);
+      u_char label;
+      if (training_labels.read(reinterpret_cast<char*>(&label),
+                               sizeof(label))) {
+        if ((size_t)label == kPositiveClass) {
+          labels_.push_back(1);
+        } else {
+          labels_.push_back(0);
+        }
+        lbl_count++;
+      }
+    }
+  }
+}
+
+// loading images
+std::istream& operator>>(std::istream& is, Network& network) {
+  return is;
+}
+std::vector<Layer> Network::GetLayers() {
+  return layers_;
+}
+
+}  // namespace neural_net

@@ -50,6 +50,7 @@ include("${CINDER_PATH}/proj/cmake/modules/cinderMakeApp.cmake")
 
 list(APPEND SOURCE_FILES    ${CORE_SOURCE_FILES}
         src/visualizer/neural_network_app.cc
+        src/visualizer/network_visualization.cc
         src/core/network.cc
         src/core/neuron.cc
         src/core/layer.cc)
@@ -60,6 +61,13 @@ ci_make_app(
         APP_NAME        neural-net-visualization
         CINDER_PATH     ${CINDER_PATH}
         SOURCES         apps/cinder_app_main.cc ${SOURCE_FILES}
+        INCLUDES        include
+)
+
+ci_make_app(
+        APP_NAME        neural-net-main
+        CINDER_PATH     ${CINDER_PATH}
+        SOURCES         apps/train_model_main.cc ${SOURCE_FILES}
         INCLUDES        include
 )
 
