@@ -81,12 +81,12 @@ void Network::Train() {
 
       layers_[0].LoadInputActivations(images_[image_index]);
       layers_[1].ForwardPassHidden(layers_[0]);
-      float output = layers_[2].ForwardPassOutput(layers_[1]);
-      float cost =
-          GetSparseCategoricalCrossEntropy(output, labels_[image_index]);
-      std::cout << "Label: " << labels_[image_index] << ", Output: " << output
-                << ", Cost: " << cost << std::endl;
-      // layers_[2].ForwardPassOutput(layers_[1]);
+      //float output = layers_[2].ForwardPassOutput(layers_[1]);
+      //float cost =
+      //    GetSparseCategoricalCrossEntropy(output, labels_[image_index]);
+      //std::cout << "Label: " << labels_[image_index] << ", Output: " << output
+      //          << ", Cost: " << cost << std::endl;
+      layers_[2].ForwardPassOutput(layers_[1]);
       BackPropagation(labels_[image_index]);
       layers_[num_hidden_layers_ + 1].CalculateAllGradients(images_.size());
       layers_[num_hidden_layers_].CalculateAllGradients(images_.size());
@@ -95,6 +95,8 @@ void Network::Train() {
     for (size_t k = 1; k < layers_.size(); k++) {
       layers_[k].UpdateWeights(learning_rate_);
     }
+    std::string save_file = "/home/ash/UIUC/CS126/Cinder/my_projects/final-project-ash-maheriya/include/core/model.bin";
+    SaveNetwork(save_file);
     std::cout << "Batch complete" << std::endl;
   }
 }
@@ -185,6 +187,43 @@ std::istream& operator>>(std::istream& is, Network& network) {
 }
 std::vector<Layer> Network::GetLayers() {
   return layers_;
+}
+void Network::SaveNetwork(std::string& save_file_name) {
+  std::ofstream save_file;
+  save_file.open(save_file_name, std::ios::out | std::ios::binary);
+  for (const Layer& layer : layers_) {
+    for (size_t i = 0; i < layer.GetWeights().size(); i++) {
+      for (size_t j = 0; j < layer.GetWeights()[i].size(); j++) {
+        float weight = layer.GetWeights()[i][j];
+        save_file.write(reinterpret_cast<const char*>(&weight), sizeof(weight));
+      }
+    }
+    for (const Neuron& neuron : layer.GetNeurons()) {
+      float activation = neuron.GetActivation();
+      save_file.write(reinterpret_cast<const char*>(&activation), sizeof(activation));
+    }
+  }
+  save_file.close();
+
+}
+void Network::LoadNetwork(std::string& load_file_name) {
+  std::ifstream load_file;
+  load_file.open(load_file_name, std::ifstream::in | std::ios::binary);
+  for (Layer& layer : layers_) {
+    for (size_t i = 0; i < layer.GetWeights().size(); i++) {
+      for (size_t j = 0; j < layer.GetWeights()[i].size(); j++) {
+        float weight;
+        load_file.read(reinterpret_cast<char*>(&weight), sizeof(weight));
+        layer.SetWeight(i, j, weight);
+      }
+    }
+    for (Neuron& neuron : layer.GetNeurons()) {
+      float activation;
+      load_file.read(reinterpret_cast<char*>(&activation), sizeof(activation));
+      neuron.SetActivation(activation);
+    }
+  }
+  load_file.close();
 }
 
 }  // namespace neural_net

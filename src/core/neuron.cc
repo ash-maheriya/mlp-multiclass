@@ -29,7 +29,7 @@ float Neuron::ForwardPass(const std::vector<float>& weights, const std::vector<f
 float Neuron::Sigmoid(float value) {
   return 1.0 / (1.0 + exp(-1.0*value));
 }
-float Neuron::GetActivation() {
+float Neuron::GetActivation() const{
   return activation_;
 }
 
