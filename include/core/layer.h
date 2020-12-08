@@ -51,6 +51,10 @@ class Layer {
 
   void PrintActivations();
 
+  std::vector<std::vector<float>> GetWeights() const;
+
+  void SetWeight(size_t neuron_index, size_t weight_index, float value);
+
  private:
   const float kBias = 1;
 

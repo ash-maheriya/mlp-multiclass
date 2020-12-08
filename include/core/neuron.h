@@ -20,7 +20,7 @@ class Neuron {
    */
   float ForwardPass(const std::vector<float>& weights, const std::vector<float>& values);
 
-  float GetActivation();
+  float GetActivation() const;
 
   void CalculateError(float prev_error);
 

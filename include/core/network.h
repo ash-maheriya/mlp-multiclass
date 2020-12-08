@@ -35,6 +35,10 @@ class Network {
 
   void LoadData(std::string& images_dir, std::string& labels_dir);
 
+  void SaveNetwork(std::string& save_file_name);
+
+  void LoadNetwork(std::string& load_file_name);
+
   std::vector<Layer> GetLayers();
  private:
   const size_t kPositiveClass = 4;

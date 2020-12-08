@@ -116,6 +116,13 @@ void Layer::PrintActivations() {
   }
   printf("\n");
 }
+std::vector<std::vector<float>> Layer::GetWeights() const {
+  return weights_;
+}
+
+void Layer::SetWeight(size_t neuron_index, size_t weight_index, float value) {
+  weights_[neuron_index][weight_index] = value;
+}
 
 }
 // namespace neural_net
