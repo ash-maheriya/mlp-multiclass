@@ -95,6 +95,8 @@ void Network::Train() {
     for (size_t k = 1; k < layers_.size(); k++) {
       layers_[k].UpdateWeights(learning_rate_);
     }
+    std::string save_file = "/home/ash/UIUC/CS126/Cinder/my_projects/final-project-ash-maheriya/include/core/model.bin";
+    SaveNetwork(save_file);
     std::cout << "Batch complete" << std::endl;
   }
 }
@@ -191,7 +193,7 @@ void Network::SaveNetwork(std::string& save_file_name) {
   save_file.open(save_file_name, std::ios::out | std::ios::binary);
   for (const Layer& layer : layers_) {
     for (size_t i = 0; i < layer.GetWeights().size(); i++) {
-      for (size_t j = 0; i < layer.GetWeights()[i].size(); j++) {
+      for (size_t j = 0; j < layer.GetWeights()[i].size(); j++) {
         float weight = layer.GetWeights()[i][j];
         save_file.write(reinterpret_cast<const char*>(&weight), sizeof(weight));
       }
@@ -209,7 +211,7 @@ void Network::LoadNetwork(std::string& load_file_name) {
   load_file.open(load_file_name, std::ifstream::in | std::ios::binary);
   for (Layer& layer : layers_) {
     for (size_t i = 0; i < layer.GetWeights().size(); i++) {
-      for (size_t j = 0; i < layer.GetWeights()[i].size(); j++) {
+      for (size_t j = 0; j < layer.GetWeights()[i].size(); j++) {
         float weight;
         load_file.read(reinterpret_cast<char*>(&weight), sizeof(weight));
         layer.SetWeight(i, j, weight);
