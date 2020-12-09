@@ -6,6 +6,7 @@
 
 #include <tgmath.h>
 
+#include <algorithm>
 #include <cstring>
 #include <fstream>
 #include <iostream>
@@ -71,15 +72,15 @@ void Network::Train() {
   }
 
   size_t image_index = 0;
-  for (size_t i = 0; i < batch_size / batch_size; i++) {
+  size_t num_batches = images_.size()/batch_size;
+  for (size_t i = 0; i < num_batches; i++) {  // looping through batches
     layers_[1].ResetAllDeltas();
     layers_[2].ResetAllDeltas();
-    for (size_t j = 0; j < batch_size; j++) {
+    for (size_t j = 0; j < batch_size; j++) { // looping through images
       if (image_index > images_.size()) {
         continue;
       }
-
-      layers_[0].LoadInputActivations(images_[image_index]);
+      layers_[0].LoadInputActivations(images_[indices_[image_index]]);
       layers_[1].ForwardPassHidden(layers_[0]);
       //float output = layers_[2].ForwardPassOutput(layers_[1]);
       //float cost =
@@ -87,7 +88,7 @@ void Network::Train() {
       //std::cout << "Label: " << labels_[image_index] << ", Output: " << output
       //          << ", Cost: " << cost << std::endl;
       layers_[2].ForwardPassOutput(layers_[1]);
-      BackPropagation(labels_[image_index]);
+      BackPropagation(labels_[indices_[image_index]]);
       layers_[num_hidden_layers_ + 1].CalculateAllGradients(images_.size());
       layers_[num_hidden_layers_].CalculateAllGradients(images_.size());
       image_index++;
@@ -154,6 +155,7 @@ void Network::LoadTrainingData(std::string& images_dir, std::string& labels_dir,
   DIR* img_dir;
   struct dirent* img_ent;
   int img_index = -1;
+  int img_count = 0;
   if ((img_dir = opendir(images_dir.c_str())) != NULL) {
     while ((img_ent = readdir(img_dir)) != NULL) {
       std::string f_name = img_ent->d_name;
@@ -177,24 +179,25 @@ void Network::LoadTrainingData(std::string& images_dir, std::string& labels_dir,
       }
       //PrintImage(img);
       images_.push_back(img);
+      img_count++;
     }
   }
 
   // removing the negative labels
-  for (size_t i = 0; i < labels_.size(); i++) {
-    if (labels_[i] != 1) {
-      labels_.erase(labels_.begin() + i);
-    }
+  labels_.clear();
+  for (size_t i = 0; i < images_.size(); i++) {
+    labels_.push_back(1);
   }
 
   DIR* fsn_dir;
   struct dirent* fsn_ent;
   int fsn_index = -1;
+  int fsn_count = 0;
   if ((fsn_dir = opendir(fashion_dir.c_str())) != NULL) {
     while ((fsn_ent = readdir(fsn_dir)) != NULL) {
       std::string f_name = fsn_ent->d_name;
       fsn_index++;
-      if (!strcmp(f_name.c_str(), ".") || !strcmp(f_name.c_str(), "..") || fsn_index >= img_index) {
+      if (!strcmp(f_name.c_str(), ".") || !strcmp(f_name.c_str(), "..") || fsn_index > img_count) {
         continue;
       }
       std::string img_file = fashion_dir + f_name;
@@ -214,8 +217,14 @@ void Network::LoadTrainingData(std::string& images_dir, std::string& labels_dir,
       //PrintImage(img);
       images_.push_back(img);
       labels_.push_back(0);
+      fsn_count++;
     }
   }
+
+  for (size_t i = 0; i < images_.size(); i++) {
+    indices_.push_back(i);
+  }
+  std::random_shuffle(indices_.begin(), indices_.end());
 }
 
 std::vector<Layer> Network::GetLayers() {
@@ -306,11 +315,12 @@ void Network::LoadTestingData(std::string& images_dir, std::string& labels_dir,
   DIR* img_dir;
   struct dirent* img_ent;
   int img_index = -1;
+  int img_count = 0;
   if ((img_dir = opendir(images_dir.c_str())) != NULL) {
     while ((img_ent = readdir(img_dir)) != NULL) {
       std::string f_name = img_ent->d_name;
       img_index++;
-      if (!strcmp(f_name.c_str(), ".") || !strcmp(f_name.c_str(), "..") || labels_[img_index] != 1) {
+      if (!strcmp(f_name.c_str(), ".") || !strcmp(f_name.c_str(), "..") || test_labels_[img_index] != 1) {
         continue;
       }
       std::string img_file = images_dir + f_name;
@@ -329,24 +339,25 @@ void Network::LoadTestingData(std::string& images_dir, std::string& labels_dir,
       }
       //PrintImage(img);
       test_images_.push_back(img);
+      img_count++;
     }
   }
 
   // removing the negative labels
   test_labels_.clear();
-  for (size_t i = 0; i < images_.size(); i++) {
+  for (size_t i = 0; i < test_images_.size(); i++) {
     test_labels_.push_back(1);
   }
 
-  // fashion images + labels
   DIR* fsn_dir;
   struct dirent* fsn_ent;
   int fsn_index = -1;
+  int fsn_count = 0;
   if ((fsn_dir = opendir(fashion_dir.c_str())) != NULL) {
     while ((fsn_ent = readdir(fsn_dir)) != NULL) {
       std::string f_name = fsn_ent->d_name;
       fsn_index++;
-      if (!strcmp(f_name.c_str(), ".") || !strcmp(f_name.c_str(), "..") || fsn_index >= img_index) {
+      if (!strcmp(f_name.c_str(), ".") || !strcmp(f_name.c_str(), "..") || fsn_index > img_count) {
         continue;
       }
       std::string img_file = fashion_dir + f_name;
@@ -366,7 +377,31 @@ void Network::LoadTestingData(std::string& images_dir, std::string& labels_dir,
       //PrintImage(img);
       test_images_.push_back(img);
       test_labels_.push_back(0);
+      fsn_count++;
     }
   }
+}
+void Network::ValidateNetwork() {
+  size_t total_images = test_images_.size();
+  float true_positives = 0;
+  float false_positives = 0;
+  float false_negatives = 0;
+  for (size_t i = 0; i < total_images; i++) {
+    size_t prediction = MakePrediction(test_images_[i]);
+    if (test_labels_[i] == 1) {
+      if (prediction == 1) {
+        true_positives++;
+      } else {
+        false_negatives++;
+      }
+    } else {
+      if (prediction != 0) {
+        false_positives++;
+      }
+    }
+  }
+  float precision = true_positives / (true_positives + false_positives);
+  float recall = true_positives / (true_positives + false_negatives);
+  std::cout << "Precision: " << precision << ", Recall: " << recall << std::endl;
 }
 }  // namespace neural_net

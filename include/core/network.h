@@ -41,6 +41,8 @@ class Network {
 
   size_t MakePrediction(Image_t img);
 
+  void ValidateNetwork();
+
   std::vector<Layer> GetLayers();
  private:
   const size_t kPositiveClass = 4;
@@ -53,6 +55,7 @@ class Network {
 
   std::vector<Image_t> images_;
   std::vector<size_t> labels_;
+  std::vector<size_t> indices_;
   std::vector<Image_t> test_images_;
   std::vector<size_t> test_labels_;
   size_t batch_size = 100;
