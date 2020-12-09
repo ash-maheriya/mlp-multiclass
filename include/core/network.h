@@ -29,11 +29,9 @@ class Network {
 
   void BackPropagation(size_t label);
 
-  friend std::istream& operator>>(std::istream& is, Network& network);  // loading images;
-
   float GetSparseCategoricalCrossEntropy(float output_activation, size_t ground_truth);
 
-  void LoadData(std::string& images_dir, std::string& labels_dir);
+  void LoadData(std::string& images_dir, std::string& labels_dir, std::string& fashion_dir);
 
   void SaveNetwork(std::string& save_file_name);
 

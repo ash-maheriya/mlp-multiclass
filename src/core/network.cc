@@ -121,40 +121,11 @@ void Network::BackPropagation(size_t label) {
       layers_[num_hidden_layers_ + 1].GetErrors());
 }
 
-void Network::LoadData(std::string& images_dir, std::string& labels_dir) {
+void Network::LoadData(std::string& images_dir, std::string& labels_dir, std::string& fashion_dir) {
   images_.clear();
   labels_.clear();
   // code for iterating over directory from:
   // https://stackoverflow.com/questions/612097/how-can-i-get-the-list-of-files-in-a-directory-using-c-or-c
-  DIR* img_dir;
-  struct dirent* img_ent;
-  size_t img_count = 0;
-  if ((img_dir = opendir(images_dir.c_str())) != NULL) {
-    while ((img_ent = readdir(img_dir)) != NULL) {
-      std::string f_name = img_ent->d_name;
-      if (!strcmp(f_name.c_str(), ".") || !strcmp(f_name.c_str(), "..")) {
-        continue;
-      }
-      std::string img_file = images_dir + f_name;
-      ifstream training_images;
-      training_images.open(img_file, ifstream::in);
-      float pixel;
-      Image_t img =
-          vector<vector<float>>(kImageSize, vector<float>(kImageSize));
-      for (size_t row = 0; row < 28; row++) {
-        for (size_t col = 0; col < 28; col++) {
-          if (training_images.read(reinterpret_cast<char*>(&pixel),
-                                   sizeof(pixel))) {
-            img[row][col] = pixel;
-          }
-        }
-      }
-      //PrintImage(img);
-      images_.push_back(img);
-      img_count++;
-    }
-  }
-
   DIR* lbl_dir;
   struct dirent* lbl_ent;
   size_t lbl_count = 0;
@@ -179,12 +150,74 @@ void Network::LoadData(std::string& images_dir, std::string& labels_dir) {
       }
     }
   }
+
+  DIR* img_dir;
+  struct dirent* img_ent;
+  int img_index = -1;
+  if ((img_dir = opendir(images_dir.c_str())) != NULL) {
+    while ((img_ent = readdir(img_dir)) != NULL) {
+      std::string f_name = img_ent->d_name;
+      img_index++;
+      if (!strcmp(f_name.c_str(), ".") || !strcmp(f_name.c_str(), "..") || labels_[img_index] != 1) {
+        continue;
+      }
+      std::string img_file = images_dir + f_name;
+      ifstream training_images;
+      training_images.open(img_file, ifstream::in);
+      float pixel;
+      Image_t img =
+          vector<vector<float>>(kImageSize, vector<float>(kImageSize));
+      for (size_t row = 0; row < 28; row++) {
+        for (size_t col = 0; col < 28; col++) {
+          if (training_images.read(reinterpret_cast<char*>(&pixel),
+                                   sizeof(pixel))) {
+            img[row][col] = pixel;
+          }
+        }
+      }
+      //PrintImage(img);
+      images_.push_back(img);
+    }
+  }
+
+  // removing the negative labels
+  for (size_t i = 0; i < labels_.size(); i++) {
+    if (labels_[i] != 1) {
+      labels_.erase(labels_.begin() + i);
+    }
+  }
+
+  DIR* fsn_dir;
+  struct dirent* fsn_ent;
+  int fsn_index = -1;
+  if ((fsn_dir = opendir(fashion_dir.c_str())) != NULL) {
+    while ((fsn_ent = readdir(fsn_dir)) != NULL) {
+      std::string f_name = fsn_ent->d_name;
+      fsn_index++;
+      if (!strcmp(f_name.c_str(), ".") || !strcmp(f_name.c_str(), "..") || fsn_index >= img_index) {
+        continue;
+      }
+      std::string img_file = fashion_dir + f_name;
+      ifstream training_images;
+      training_images.open(img_file, ifstream::in);
+      float pixel;
+      Image_t img =
+          vector<vector<float>>(kImageSize, vector<float>(kImageSize));
+      for (size_t row = 0; row < 28; row++) {
+        for (size_t col = 0; col < 28; col++) {
+          if (training_images.read(reinterpret_cast<char*>(&pixel),
+                                   sizeof(pixel))) {
+            img[row][col] = pixel;
+          }
+        }
+      }
+      //PrintImage(img);
+      images_.push_back(img);
+      labels_.push_back(0);
+    }
+  }
 }
 
-// loading images
-std::istream& operator>>(std::istream& is, Network& network) {
-  return is;
-}
 std::vector<Layer> Network::GetLayers() {
   return layers_;
 }

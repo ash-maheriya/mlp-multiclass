@@ -20,7 +20,8 @@ NetworkVisualization::NetworkVisualization(double height, double width,
   std::string lbl_dir =
       "/home/ash/UIUC/CS126/Cinder/my_projects/final-project-ash-maheriya/"
       "mnist/train/lbl/";
-  network_.LoadData(img_dir, lbl_dir);
+  std::string fashion_dir = "/home/ash/UIUC/CS126/Cinder/my_projects/final-project-ash-maheriya/fashion_mnist/train/img";
+  network_.LoadData(img_dir, lbl_dir, fashion_dir);
   network_.Train();
 
   neuron_sizes.push_back(1);  // input neuron size
