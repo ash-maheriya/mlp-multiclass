@@ -12,7 +12,7 @@ int main(int argc, char** argv) {
   std::string lbl_dir = "/home/ash/UIUC/CS126/Cinder/my_projects/final-project-ash-maheriya/mnist/train/lbl/";
   std::string fashion_dir = "/home/ash/UIUC/CS126/Cinder/my_projects/final-project-ash-maheriya/fashion_mnist/train/img";
   std::cout << "Beginning to load data" << std::endl;
-  network.LoadData(img_dir, lbl_dir, fashion_dir);
+  network.LoadTrainingData(img_dir, lbl_dir, fashion_dir);
   std::cout << "Finished loading, beginning training" << std::endl;
   network.Train();
   std::cout << "Finished training!" << std::endl;

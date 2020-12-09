@@ -29,13 +29,17 @@ class Network {
 
   void BackPropagation(size_t label);
 
-  float GetSparseCategoricalCrossEntropy(float output_activation, size_t ground_truth);
+  float CalculateLoss(float output_activation, size_t ground_truth);
 
-  void LoadData(std::string& images_dir, std::string& labels_dir, std::string& fashion_dir);
+  void LoadTrainingData(std::string& images_dir, std::string& labels_dir, std::string& fashion_dir);
+
+  void LoadTestingData(std::string& images_dir, std::string& labels_dir, std::string& fashion_dir);
 
   void SaveNetwork(std::string& save_file_name);
 
   void LoadNetwork(std::string& load_file_name);
+
+  size_t MakePrediction(Image_t img);
 
   std::vector<Layer> GetLayers();
  private:
@@ -46,8 +50,11 @@ class Network {
   size_t num_hidden_layers_ = 1;
   std::vector<Layer> layers_;
   float learning_rate_ = 0.001;
+
   std::vector<Image_t> images_;
   std::vector<size_t> labels_;
+  std::vector<Image_t> test_images_;
+  std::vector<size_t> test_labels_;
   size_t batch_size = 100;
   size_t hidden_layer_size = 64;
 };
