@@ -146,3 +146,4 @@ _deps
 /include/core/model.bin
 /mnist/
 /fashion_mnist/
+/include/core/model_old.bin

@@ -9,7 +9,7 @@
 using std::vector;
 namespace neural_net {
 Layer::Layer(vector<vector<float>> weights) : weights_(weights){
-  values_.push_back(kBias);
+  values_.push_back(1);
   errors_.push_back(1);
   if (weights_.size() == 0) {
     for (size_t j = 0; j < 28*28; j++) {
@@ -32,7 +32,6 @@ float Layer::GetSize() const{
 void Layer::UpdateValues() {
   for (size_t i = 1; i < values_.size(); i++) {
     values_[i] = neurons_[i-1].GetActivation();
-    errors_[i] = neurons_[i-1].GetError();
   }
 }
 
@@ -49,16 +48,34 @@ float Layer::ForwardPassOutput(Layer& prev_layer) {
   return output;
 }
 
-void Layer::CalculateErrors(std::vector<float> next_errors) {
-  float value;
-  for (size_t i = 0; i < neurons_.size(); i++) {
-    value = 0;
-    for (size_t j = 1; j < weights_[i].size(); j++) {
-      value += weights_[i][j] * next_errors[j];
-    }
-    neurons_[i].CalculateError(value);
+void Layer::CalculateErrors(const std::vector<std::vector<double>>& next_weights, const Error_Collection_t& next_errors) {
+//  float value;
+//  for (size_t i = 0; i < neurons_.size(); i++) {
+//    value = 0;
+//    for (size_t j = 1; j < weights_[i].size(); j++) {
+//      value += weights_[i][j] * next_errors[j];
+//    }
+//    neurons_[i].CalculateError(value);
+//  }
+//  UpdateValues();
+
+  vector<float> sigmoid_primes;
+  for (const Neuron& neuron : neurons_) {
+    sigmoid_primes.push_back(neurons_[0].GetActivation() * (1.0 - neurons_[0].GetActivation()));
   }
-  UpdateValues();
+
+  vector<float> weight_error_products;
+  float value;
+  for (size_t i = 0; i < errors_.size(); i++) {
+    value = 0;
+    for (size_t j = 0; j < next_weights.size(); j++) {
+      value += next_weights[j][i] * next_errors[j];
+    }
+    weight_error_products.push_back(value);
+  }
+  for (size_t i = 0; i < errors_.size(); i++) {
+    errors_[i] = weight_error_products[i] * sigmoid_primes[i];
+  }
 }
 
 std::vector<Neuron> Layer::GetNeurons() const{
@@ -66,11 +83,10 @@ std::vector<Neuron> Layer::GetNeurons() const{
 }
 
 void Layer::CalculateOutputError(size_t label) {
-  neurons_[0].SetError(neurons_[0].GetActivation() - label);
-  UpdateValues();
+  errors_[0] = neurons_[0].GetActivation() - label;
 }
 
-std::vector<float> Layer::GetErrors() const {
+Error_Collection_t Layer::GetErrors() const {
   return errors_;
 }
 
@@ -86,7 +102,7 @@ void Layer::CalculateAllGradients(size_t batch_size) {
   }
 }
 
-void Layer::UpdateWeights(float learning_rate) {
+void Layer::  UpdateWeights(float learning_rate) {
   for (size_t i = 0; i < weights_.size(); i++) {
     for (size_t j = 1; j < weights_[i].size(); j++) {
       weights_[i][j] -= learning_rate * neurons_[i].GetGradient();
@@ -123,6 +139,7 @@ std::vector<std::vector<float>> Layer::GetWeights() const {
 void Layer::SetWeight(size_t neuron_index, size_t weight_index, float value) {
   weights_[neuron_index][weight_index] = value;
 }
+
 
 }
 // namespace neural_net

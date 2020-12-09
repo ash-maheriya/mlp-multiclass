@@ -31,7 +31,7 @@ class Layer {
    */
   float GetSize() const;
 
-  void CalculateErrors(std::vector<float> next_errors);
+  void CalculateErrors(const std::vector<std::vector<double>>& next_weights, const Error_Collection_t& next_errors);
 
   void CalculateOutputError(size_t label);
 
@@ -43,7 +43,7 @@ class Layer {
 
   void UpdateWeights(float learning_rate);
 
-  std::vector<float> GetErrors() const;
+  Error_Collection_t GetErrors() const;
 
   std::vector<Neuron> GetNeurons() const;
 
@@ -56,11 +56,9 @@ class Layer {
   void SetWeight(size_t neuron_index, size_t weight_index, float value);
 
  private:
-  const float kBias = 1;
-
   std::vector<Neuron> neurons_;
   std::vector<std::vector<float>> weights_;
   std::vector<float> values_;
-  std::vector<float> errors_;
+  Error_Collection_t errors_;
 };
 }
