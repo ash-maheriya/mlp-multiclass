@@ -31,13 +31,13 @@ class Layer {
    */
   float GetSize() const;
 
-  void CalculateErrors(const std::vector<std::vector<double>>& next_weights, const Error_Collection_t& next_errors);
+  void CalculateErrors(const std::vector<std::vector<float>>& next_weights, const Error_Collection_t& next_errors);
 
   void CalculateOutputError(size_t label);
 
   void UpdateValues();
 
-  void IncrementAllDeltas(std::vector<float> next_errors);
+  void IncrementAllDeltas(const std::vector<float>& prev_values);
 
   void CalculateAllGradients(size_t batch_size);
 
@@ -55,10 +55,14 @@ class Layer {
 
   void SetWeight(size_t neuron_index, size_t weight_index, float value);
 
+  std::vector<float> GetValues();
+
  private:
   std::vector<Neuron> neurons_;
   std::vector<std::vector<float>> weights_;
   std::vector<float> values_;
   Error_Collection_t errors_;
+  Delta_Collection_t deltas_;
+  Gradient_Collection_t gradients_;
 };
 }

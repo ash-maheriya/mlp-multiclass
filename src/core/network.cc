@@ -90,11 +90,10 @@ void Network::Train() {
                   << ", Output: " << output << ", Cost: " << cost << std::endl;
         // layers_[2].ForwardPassOutput(layers_[1]);
         BackPropagation(labels_[indices_[image_index]]);
-        layers_[num_hidden_layers_ + 1].CalculateAllGradients(images_.size());
-        layers_[num_hidden_layers_].CalculateAllGradients(images_.size());
         image_index++;
       }
       for (size_t k = 1; k < layers_.size(); k++) {
+        layers_[k].CalculateAllGradients(batch_size);
         layers_[k].UpdateWeights(learning_rate_);
       }
       std::string save_file =
@@ -117,9 +116,9 @@ float Network::CalculateLoss(float output_activation, size_t ground_truth) {
 
 void Network::BackPropagation(size_t label) {
   layers_[num_hidden_layers_ + 1].CalculateOutputError(label);
-  layers_[num_hidden_layers_].CalculateErrors(layers_[num_hidden_layers_ + 1].GetErrors());
-  layers_[num_hidden_layers_ + 1].IncrementAllDeltas(layers_[num_hidden_layers_ + 1].GetErrors());
-  layers_[num_hidden_layers_].IncrementAllDeltas(layers_[num_hidden_layers_ + 1].GetErrors());
+  layers_[num_hidden_layers_].CalculateErrors(layers_[num_hidden_layers_ + 1].GetWeights(), layers_[num_hidden_layers_ + 1].GetErrors());
+  layers_[num_hidden_layers_ + 1].IncrementAllDeltas(layers_[num_hidden_layers_].GetValues());
+  layers_[num_hidden_layers_].IncrementAllDeltas(layers_[0].GetValues());
 }
 
 void Network::LoadTrainingData(std::string& images_dir, std::string& labels_dir,
