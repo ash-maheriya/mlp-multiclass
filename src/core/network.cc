@@ -49,7 +49,7 @@ Network::Network(size_t image_size) : kImageSize(image_size) {
   //  vector<float>(10)); // output layer
   for (size_t layer = 1; layer < num_hidden_layers_ + 2; layer++) {
     for (size_t i = 0; i < weights_[layer].size(); i++) {
-      weights_[layer][i][0] = 0;  // TODO: Randomize this (will serve as bias)
+      weights_[layer][i][0] = 0;  // bias term
       for (size_t j = 1; j < weights_[layer][i].size(); j++) {
         weights_[layer][i][j] =
             static_cast<float>(rand()) / static_cast<float>(RAND_MAX) - 0.5;
@@ -100,8 +100,9 @@ void Network::Train() {
         layers_[1].ForwardPassHidden(layers_[0]);
         output = layers_[2].ForwardPassOutput(layers_[1]);
         cost += CalculateLoss(output, labels_[indices_[image_index]]);
-//        std::cout << "Label: " << labels_[indices_[image_index]]
-//                  << ", Output: " << output << ", Cost: " << cost << std::endl;
+        //        std::cout << "Label: " << labels_[indices_[image_index]]
+        //                  << ", Output: " << output << ", Cost: " << cost <<
+        //                  std::endl;
         // layers_[2].ForwardPassOutput(layers_[1]);
         BackPropagation(labels_[indices_[image_index]]);
         image_index++;
@@ -115,7 +116,9 @@ void Network::Train() {
         layers_[k].UpdateWeights(learning_rate_);
       }
       if (iterations % 50 == 0) {
-        std::cout << "Iteration: " << iterations << ", Cost: " << cost/(batch_size) << ", Epochs: " << epoch << " out of " << num_epochs << std::endl;
+        std::cout << "Iteration: " << iterations
+                  << ", Cost: " << cost / (batch_size) << ", Epochs: " << epoch
+                  << " out of " << num_epochs << std::endl;
         ValidateNetwork();
       }
     }
@@ -138,12 +141,16 @@ float Network::CalculateLoss(float output_activation, size_t ground_truth) {
 
 void Network::BackPropagation(size_t label) {
   layers_[num_hidden_layers_ + 1].CalculateOutputError(label);
-  layers_[num_hidden_layers_].CalculateErrors(layers_[num_hidden_layers_ + 1].GetWeights(), layers_[num_hidden_layers_ + 1].GetErrors());
-  layers_[num_hidden_layers_ + 1].IncrementAllDeltas(layers_[num_hidden_layers_].GetValues());
+  layers_[num_hidden_layers_].CalculateErrors(
+      layers_[num_hidden_layers_ + 1].GetWeights(),
+      layers_[num_hidden_layers_ + 1].GetErrors());
+  layers_[num_hidden_layers_ + 1].IncrementAllDeltas(
+      layers_[num_hidden_layers_].GetValues());
   layers_[num_hidden_layers_].IncrementAllDeltas(layers_[0].GetValues());
 }
 
-void Network::LoadTrainingData(std::string& images_dir, std::string& labels_dir) {
+void Network::LoadTrainingData(std::string& images_dir,
+                               std::string& labels_dir) {
   images_.clear();
   labels_.clear();
   // code for iterating over directory from:
@@ -199,7 +206,7 @@ void Network::LoadTrainingData(std::string& images_dir, std::string& labels_dir)
         }
       }
       images_.push_back(img);
-//      PrintImage(images_[img_count], labels_[img_count]);
+      //      PrintImage(images_[img_count], labels_[img_count]);
       img_count++;
     }
   }
@@ -258,13 +265,14 @@ size_t Network::MakePrediction(Image_t img) {
   //    GetSparseCategoricalCrossEntropy(output, labels_[image_index]);
   // std::cout << "Label: " << labels_[image_index] << ", Output: " << output
   //          << ", Cost: " << cost << std::endl;
-  if (output > 0.48) {
+  if (output > positive_threshold_) {
     return 1;
   } else {
     return 0;
   }
 }
-void Network::LoadTestingData(std::string& images_dir, std::string& labels_dir) {
+void Network::LoadTestingData(std::string& images_dir,
+                              std::string& labels_dir) {
   test_images_.clear();
   test_labels_.clear();
   // code for iterating over directory from:
@@ -320,7 +328,7 @@ void Network::LoadTestingData(std::string& images_dir, std::string& labels_dir) 
         }
       }
       test_images_.push_back(img);
-//      PrintImage(test_images_[img_count], test_labels_[img_count]);
+      //      PrintImage(test_images_[img_count], test_labels_[img_count]);
       img_count++;
     }
   }
@@ -339,7 +347,7 @@ void Network::ValidateNetwork() {
         false_negatives++;
       }
     } else {
-      if (prediction != 0) {
+      if (prediction == 1) {
         false_positives++;
       }
     }

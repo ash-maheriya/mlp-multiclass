@@ -21,9 +21,9 @@ NetworkVisualization::NetworkVisualization(double height, double width,
       "/home/ash/UIUC/CS126/Cinder/my_projects/final-project-ash-maheriya/"
       "mnist/train/lbl/";
   network_.LoadTrainingData(img_dir, lbl_dir);
-  network_.Train();
+  //network_.Train();
   std::string load_file = "/home/ash/UIUC/CS126/Cinder/my_projects/final-project-ash-maheriya/include/core/model.bin";
-  //network.LoadNetwork(load_file);
+  network_.LoadNetwork(load_file);
   neuron_sizes.push_back(1);  // input neuron size
   neuron_sizes.push_back(10);  // hidden neuron size
   neuron_sizes.push_back(20); // output neuron size

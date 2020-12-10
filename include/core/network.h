@@ -51,7 +51,8 @@ class Network {
   Weight_Collection_t weights_;
   size_t num_hidden_layers_ = 1;
   std::vector<Layer> layers_;
-  float learning_rate_ = 0.001;
+  float learning_rate_ = 0.01;
+  float positive_threshold_ = 0.48;
 
   std::vector<Image_t> images_;
   std::vector<size_t> labels_;

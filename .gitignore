@@ -147,3 +147,5 @@ _deps
 /mnist/
 /fashion_mnist/
 /include/core/model_old.bin
+/logs/training_binary_classification_2020-12-09#1.txt
+/include/core/model_binary_classification_2020-12-09#1.bin
