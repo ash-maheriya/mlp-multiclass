@@ -122,7 +122,7 @@ void Network::Train() {
     std::string save_file =
         "/home/ash/UIUC/CS126/Cinder/my_projects/final-project-ash-maheriya/"
         "include/core/model.bin";
-    SaveNetwork(save_file);
+    //SaveNetwork(save_file);
     std::random_shuffle(indices_.begin(), indices_.end());
   }
 }

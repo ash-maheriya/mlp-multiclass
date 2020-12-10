@@ -27,10 +27,6 @@ Layer::Layer(vector<vector<float>> weights) : weights_(weights){
   }
 }
 
-float Layer::GetSize() const{
-  return neurons_.size();
-}
-
 void Layer::UpdateValues() {
   for (size_t i = 1; i < values_.size(); i++) {
     values_[i] = neurons_[i-1].GetActivation();
@@ -127,12 +123,6 @@ void Layer::ResetAllDeltas() {
   }
 }
 
-void Layer::PrintActivations() {
-  for (Neuron& neuron : neurons_) {
-    printf("%6.4f ", neuron.GetActivation());
-  }
-  printf("\n");
-}
 std::vector<std::vector<float>> Layer::GetWeights() const {
   return weights_;
 }

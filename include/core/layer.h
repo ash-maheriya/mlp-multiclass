@@ -25,12 +25,6 @@ class Layer {
 
   float ForwardPassOutput(Layer& prev_layer);
 
-  /**
-   * Returns how many neurons are in the layer
-   * @return how many neurons are in the layer
-   */
-  float GetSize() const;
-
   void CalculateErrors(const std::vector<std::vector<float>>& next_weights, const Error_Collection_t& next_errors);
 
   void CalculateOutputError(size_t label);
@@ -48,8 +42,6 @@ class Layer {
   std::vector<Neuron> GetNeurons() const;
 
   void ResetAllDeltas();
-
-  void PrintActivations();
 
   std::vector<std::vector<float>> GetWeights() const;
 

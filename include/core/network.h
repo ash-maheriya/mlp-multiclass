@@ -13,7 +13,6 @@ namespace neural_net {
 
 class Network {
  public:
-  // TODO: READ NETWORK DEFINITION FROM JSON FILE
   Network(size_t image_size);
 
   /**
