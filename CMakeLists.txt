@@ -55,7 +55,7 @@ list(APPEND SOURCE_FILES    ${CORE_SOURCE_FILES}
         src/core/neuron.cc
         src/core/layer.cc)
 
-list(APPEND TEST_FILES tests/test_main.cc)
+list(APPEND TEST_FILES tests/test_main.cc tests/layer_test.cc tests/network_test.cc tests/neuron_test.cc)
 
 ci_make_app(
         APP_NAME        neural-net-visualization
