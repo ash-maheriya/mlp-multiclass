@@ -71,22 +71,10 @@ void NetworkVisualization::PlotOutputLayer() {
 
 void NetworkVisualization::DrawNetwork() {
   for (size_t layer = 1; layer < network_.GetNumHiddenLayers()+2; layer++) {
-//    for (const vec2& first_position : neuron_positions_[layer]) {
-//      for (const vec2& second_position : neuron_positions_[layer-1]) {
-//        // need something to get the weight value of the line being drawn so
-//        // then the brightness of the color can be determined
-//        ci::gl::color(ci::Color("gray"));
-//        ci::gl::drawLine(first_position, second_position);
-//        ci::gl::color(ci::Color("red"));
-//        ci::gl::drawSolidCircle(first_position, neuron_sizes[layer]);
-//        ci::gl::drawSolidCircle(second_position, neuron_sizes[layer-1]);
-//      }
-//    }
     for (size_t i = 0; i < neuron_positions_[layer].size(); i++) {
       for (size_t j = 0; j < neuron_positions_[layer-1].size(); j++) {
         float value = network_.GetLayers()[layer].GetWeights()[i][j];
-        //ci::gl::color(ci::Color("gray"));
-        ci::gl::color(ci::Color(255*std::abs(value), 0, 0));
+        ci::gl::color(ci::Color(255*std::abs(value), 100*std::abs(value), 100*std::abs(value)));
         ci::gl::drawLine(neuron_positions_[layer][i], neuron_positions_[layer-1][j]);
         ci::gl::color(ci::Color("red"));
         ci::gl::drawSolidCircle(neuron_positions_[layer][i], neuron_sizes[layer]);
