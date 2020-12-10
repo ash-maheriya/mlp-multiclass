@@ -48,7 +48,6 @@ class Network {
   const size_t kPositiveClass = 4;
   const size_t kImageSize;
 
-  Weight_Collection_t weights_;
   size_t num_hidden_layers_ = 1;
   std::vector<Layer> layers_;
   float learning_rate_ = 0.01;

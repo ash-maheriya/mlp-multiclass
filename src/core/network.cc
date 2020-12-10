@@ -37,21 +37,18 @@ Network::Network(size_t image_size) : kImageSize(image_size) {
   srand(static_cast<int>(seconds));
 
   // Initializing and randomizing the weights
-  weights_ = Weight_Collection_t(num_hidden_layers_ + 2);
-  std::cout << weights_.size();
-  weights_[1] = vector<vector<float>>(
+  Weight_Collection_t weights = Weight_Collection_t(num_hidden_layers_ + 2);
+  std::cout << weights.size();
+  weights[1] = vector<vector<float>>(
       hidden_layer_size, vector<float>(kImageSize * kImageSize +
                                        1));  // input layer for 28*28 images
-  weights_[2] = vector<vector<float>>(
+  weights[2] = vector<vector<float>>(
       1, vector<float>(hidden_layer_size + 1));  // first hidden layer
-  //  weights_[2] = vector<vector<float>>(10 + 1, vector<float>(10)); // second
-  //  hidden layer weights_[3] = vector<vector<float>>(10 + 1,
-  //  vector<float>(10)); // output layer
   for (size_t layer = 1; layer < num_hidden_layers_ + 2; layer++) {
-    for (size_t i = 0; i < weights_[layer].size(); i++) {
-      weights_[layer][i][0] = 0;  // bias term
-      for (size_t j = 1; j < weights_[layer][i].size(); j++) {
-        weights_[layer][i][j] =
+    for (size_t i = 0; i < weights[layer].size(); i++) {
+      weights[layer][i][0] = 0;  // bias term
+      for (size_t j = 1; j < weights[layer][i].size(); j++) {
+        weights[layer][i][j] =
             static_cast<float>(rand()) / static_cast<float>(RAND_MAX) - 0.5;
       }
     }
@@ -60,9 +57,9 @@ Network::Network(size_t image_size) : kImageSize(image_size) {
   // Creating the layers
   layers_.push_back(Layer(vector<vector<float>>(0)));
   for (size_t i = 1; i < num_hidden_layers_ + 1; i++) {
-    layers_.push_back(Layer(weights_[i]));
+    layers_.push_back(Layer(weights[i]));
   }
-  layers_.push_back(Layer(weights_[weights_.size() - 1]));
+  layers_.push_back(Layer(weights[weights.size() - 1]));
 }
 
 size_t Network::GetNumHiddenLayers() {
