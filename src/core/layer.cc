@@ -51,16 +51,6 @@ float Layer::ForwardPassOutput(Layer& prev_layer) {
 }
 
 void Layer::CalculateErrors(const std::vector<std::vector<float>>& next_weights, const Error_Collection_t& next_errors) {
-//  float value;
-//  for (size_t i = 0; i < neurons_.size(); i++) {
-//    value = 0;
-//    for (size_t j = 1; j < weights_[i].size(); j++) {
-//      value += weights_[i][j] * next_errors[j];
-//    }
-//    neurons_[i].CalculateError(value);
-//  }
-//  UpdateValues();
-
   vector<float> sigmoid_primes;
   for (const Neuron& neuron : neurons_) {
     sigmoid_primes.push_back(neuron.GetActivation() * (1.0 - neuron.GetActivation()));
@@ -94,9 +84,6 @@ Error_Collection_t Layer::GetErrors() const {
 }
 
 void Layer::IncrementAllDeltas(const std::vector<float>& prev_values) {
-//  for (size_t i = 0; i < neurons_.size(); i++) {
-//    neurons_[i].IncrementDelta(next_errors[i]);
-//  }
   for (size_t i = 0; i < deltas_.size(); i++) {
     deltas_[i][0] += errors_[i];
     for (size_t j = 1; j < deltas_[i].size(); j++) {
@@ -106,9 +93,6 @@ void Layer::IncrementAllDeltas(const std::vector<float>& prev_values) {
 }
 
 void Layer::CalculateAllGradients(size_t batch_size) {
-//  for (Neuron& neuron : neurons_) {
-//    neuron.CalculateGradient(batch_size);
-//  }
   for (size_t i = 0; i < gradients_.size(); i++) {
     for (size_t j = 0; j < gradients_[i].size(); j++) {
       gradients_[i][j] = deltas_[i][j] / batch_size;
@@ -119,7 +103,6 @@ void Layer::CalculateAllGradients(size_t batch_size) {
 void Layer::UpdateWeights(float learning_rate) {
   for (size_t i = 0; i < weights_.size(); i++) {
     for (size_t j = 0; j < weights_[i].size(); j++) {
-//      weights_[i][j] -= learning_rate * neurons_[i].GetGradient();
       weights_[i][j] -= learning_rate * gradients_[i][j];
     }
   }
@@ -137,15 +120,13 @@ void Layer::LoadInputActivations(const Image_t& img) {
 }
 
 void Layer::ResetAllDeltas() {
-//  for (Neuron& neuron : neurons_) {
-//    neuron.ResetDelta();
-//  }
   for (size_t i = 0; i < gradients_.size(); i++) {
     for (size_t j = 0; j < gradients_[i].size(); j++) {
       deltas_[i][j] = 0;
     }
   }
 }
+
 void Layer::PrintActivations() {
   for (Neuron& neuron : neurons_) {
     printf("%6.4f ", neuron.GetActivation());

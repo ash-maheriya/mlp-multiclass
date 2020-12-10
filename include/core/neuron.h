@@ -22,22 +22,11 @@ class Neuron {
 
   float GetActivation() const;
 
-  void CalculateError(float prev_error);
-
   float GetError();
-
-  void SetError(float error);
-
-  void IncrementDelta(float next_error);
-
-  void CalculateGradient(size_t batch_size);
 
   float GetGradient();
 
   void SetActivation(float activation);
-
-  void ResetDelta();
-
  private:
   /**
    * Sigmoid activation function maps the given value on the sigmoid graph
@@ -46,8 +35,5 @@ class Neuron {
    */
   float Sigmoid(float value);
   float activation_ = 0;
-  float error_;
-  float delta_;
-  float gradient_;
 };
 } // namespace neural_net
