@@ -11,7 +11,8 @@ external libraries that are not a part of C++ already. However, this repository 
 I used, as there are tens of thousands of images. I would recommend visiting the MNIST database (http://yann.lecun.com/exdb/mnist/),
 where you can choose the dataset(s) that you want to work with. Keep in mind that you will want to select data that
 can be distinctly categorized into two groups, even if the grouping is as simple as: a) image of a dog b) not an image of a dog.
-I used a Python script to convert files from the MNIST database into binary files.
+I used a Python script to convert files from the MNIST database into binary files. I would also recommend running the code from
+an IDE like CLion.
 
 ##Functionality
 The network is capable of training, given a dataset with images and corresponding labels. The network will periodically
