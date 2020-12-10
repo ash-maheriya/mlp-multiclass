@@ -16,14 +16,15 @@ Layer::Layer(vector<vector<float>> weights) : weights_(weights){
       neurons_.push_back(Neuron());
       values_.push_back(0);
     }
+  } else {
+    for (size_t i = 0; i < weights_.size(); i++) {
+      neurons_.push_back(Neuron());
+      values_.push_back(0);
+      errors_.push_back(0);
+    }
+    deltas_ = Delta_Collection_t(weights_.size(), vector<float>(weights_[0].size()));
+    gradients_ = Delta_Collection_t(weights_.size(), vector<float>(weights_[0].size()));
   }
-  for (size_t i = 0; i < weights_.size(); i++) {
-    neurons_.push_back(Neuron());
-    values_.push_back(0);
-    errors_.push_back(0);
-  }
-  deltas_ = Delta_Collection_t(weights_.size(), vector<float>(weights_[0].size()));
-  gradients_ = Delta_Collection_t(weights_.size(), vector<float>(weights_[0].size()));
 }
 
 float Layer::GetSize() const{
@@ -62,18 +63,19 @@ void Layer::CalculateErrors(const std::vector<std::vector<float>>& next_weights,
 
   vector<float> sigmoid_primes;
   for (const Neuron& neuron : neurons_) {
-    sigmoid_primes.push_back(neurons_[0].GetActivation() * (1.0 - neurons_[0].GetActivation()));
+    sigmoid_primes.push_back(neuron.GetActivation() * (1.0 - neuron.GetActivation()));
   }
 
   vector<float> weight_error_products;
   float value;
-  for (size_t i = 0; i < errors_.size(); i++) {
+  for (size_t i = 1; i < next_weights[0].size(); i++) { // iterating through current layer's neurons
     value = 0;
-    for (size_t j = 0; j < next_weights.size(); j++) {
+    for (size_t j = 0; j < next_weights.size(); j++) {  // iterating through next layer's neurons
       value += next_weights[j][i] * next_errors[j];
     }
     weight_error_products.push_back(value);
   }
+
   for (size_t i = 0; i < errors_.size(); i++) {
     errors_[i] = weight_error_products[i] * sigmoid_primes[i];
   }
@@ -97,7 +99,7 @@ void Layer::IncrementAllDeltas(const std::vector<float>& prev_values) {
 //  }
   for (size_t i = 0; i < deltas_.size(); i++) {
     deltas_[i][0] += errors_[i];
-    for (size_t j = 1; j < deltas_[i].size(); i++) {
+    for (size_t j = 1; j < deltas_[i].size(); j++) {
       deltas_[i][j] += prev_values[j] * errors_[i];
     }
   }
@@ -108,7 +110,7 @@ void Layer::CalculateAllGradients(size_t batch_size) {
 //    neuron.CalculateGradient(batch_size);
 //  }
   for (size_t i = 0; i < gradients_.size(); i++) {
-    for (size_t j = 0; j < gradients_[1].size(); j++) {
+    for (size_t j = 0; j < gradients_[i].size(); j++) {
       gradients_[i][j] = deltas_[i][j] / batch_size;
     }
   }

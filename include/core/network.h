@@ -31,9 +31,9 @@ class Network {
 
   float CalculateLoss(float output_activation, size_t ground_truth);
 
-  void LoadTrainingData(std::string& images_dir, std::string& labels_dir, std::string& fashion_dir);
+  void LoadTrainingData(std::string& images_dir, std::string& labels_dir);
 
-  void LoadTestingData(std::string& images_dir, std::string& labels_dir, std::string& fashion_dir);
+  void LoadTestingData(std::string& images_dir, std::string& labels_dir);
 
   void SaveNetwork(std::string& save_file_name);
 
