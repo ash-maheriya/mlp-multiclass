@@ -3,6 +3,12 @@
 #include "core/layer.h"
 #include "core/neuron.h"
 
-TEST_CASE(){
+using neural_net::Layer;
+TEST_CASE("Forward pass output"){
+  SECTION("Hidden layer forward pass") {
 
+  }
+  SECTION("Output layer forward pass") {
+
+  }
 }
