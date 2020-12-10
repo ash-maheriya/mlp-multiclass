@@ -38,6 +38,7 @@ class Neuron {
    * @return the adjusted value
    */
   float Sigmoid(float value);
+
   float activation_ = 0;
 };
 } // namespace neural_net

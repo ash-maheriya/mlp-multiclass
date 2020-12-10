@@ -4,7 +4,6 @@
 
 #include "core/layer.h"
 
-#include <iostream>
 #include <vector>
 using std::vector;
 namespace neural_net {

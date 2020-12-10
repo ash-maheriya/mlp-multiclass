@@ -77,7 +77,7 @@ void Network::Train() {
   float cost;
   size_t iterations = 0;
   size_t num_epochs = 40;
-  bool is_epoch_done = false;
+  bool is_epoch_done;
   size_t num_batches = images_.size() / batch_size;
 
   for (size_t epoch = 0; epoch < num_epochs; epoch++) {
@@ -97,10 +97,6 @@ void Network::Train() {
         layers_[1].ForwardPassHidden(layers_[0]);
         output = layers_[2].ForwardPassOutput(layers_[1]);
         cost += CalculateLoss(output, labels_[indices_[image_index]]);
-        //        std::cout << "Label: " << labels_[indices_[image_index]]
-        //                  << ", Output: " << output << ", Cost: " << cost <<
-        //                  std::endl;
-        // layers_[2].ForwardPassOutput(layers_[1]);
         BackPropagation(labels_[indices_[image_index]]);
         image_index++;
       }
@@ -122,12 +118,11 @@ void Network::Train() {
     std::string save_file =
         "/home/ash/UIUC/CS126/Cinder/my_projects/final-project-ash-maheriya/"
         "include/core/model.bin";
-    //SaveNetwork(save_file);
+    SaveNetwork(save_file);
     std::random_shuffle(indices_.begin(), indices_.end());
   }
 }
 
-// loss/cost function
 float Network::CalculateLoss(float output_activation, size_t ground_truth) {
   if (ground_truth == 1) {
     return -1.0 * (log(output_activation));
@@ -137,10 +132,13 @@ float Network::CalculateLoss(float output_activation, size_t ground_truth) {
 }
 
 void Network::BackPropagation(size_t label) {
+  // Calculate the errors for every layer except input
   layers_[num_hidden_layers_ + 1].CalculateOutputError(label);
   layers_[num_hidden_layers_].CalculateErrors(
       layers_[num_hidden_layers_ + 1].GetWeights(),
       layers_[num_hidden_layers_ + 1].GetErrors());
+
+  // Accumulate the deltas for every layer except input
   layers_[num_hidden_layers_ + 1].IncrementAllDeltas(
       layers_[num_hidden_layers_].GetValues());
   layers_[num_hidden_layers_].IncrementAllDeltas(layers_[0].GetValues());
@@ -203,7 +201,6 @@ void Network::LoadTrainingData(std::string& images_dir,
         }
       }
       images_.push_back(img);
-      //      PrintImage(images_[img_count], labels_[img_count]);
       img_count++;
     }
   }
@@ -258,10 +255,6 @@ size_t Network::MakePrediction(Image_t img) {
   layers_[0].LoadInputActivations(img);
   layers_[1].ForwardPassHidden(layers_[0]);
   float output = layers_[2].ForwardPassOutput(layers_[1]);
-  // float cost =
-  //    GetSparseCategoricalCrossEntropy(output, labels_[image_index]);
-  // std::cout << "Label: " << labels_[image_index] << ", Output: " << output
-  //          << ", Cost: " << cost << std::endl;
   if (output > positive_threshold_) {
     return 1;
   } else {
@@ -325,17 +318,15 @@ void Network::LoadTestingData(std::string& images_dir,
         }
       }
       test_images_.push_back(img);
-      //      PrintImage(test_images_[img_count], test_labels_[img_count]);
       img_count++;
     }
   }
 }
 void Network::ValidateNetwork() {
-  size_t total_images = test_images_.size();
   float true_positives = 0;
   float false_positives = 0;
   float false_negatives = 0;
-  for (size_t i = 0; i < total_images; i++) {
+  for (size_t i = 0; i < test_images_.size(); i++) {
     size_t prediction = MakePrediction(test_images_[i]);
     if (test_labels_[i] == 1) {
       if (prediction == 1) {
