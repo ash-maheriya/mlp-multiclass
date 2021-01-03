@@ -20,6 +20,10 @@ class Neuron {
    */
   float ForwardPass(const std::vector<float>& weights, const std::vector<float>& values);
 
+  float OutputPass(const std::vector<float>& weights, const std::vector<float>& values);
+
+  void Softmax(std::vector<float>& values);
+
   /**
    * Returns the activation value of the neuron
    * @return activation of the neuron

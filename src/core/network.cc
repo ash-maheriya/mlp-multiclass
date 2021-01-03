@@ -43,7 +43,7 @@ Network::Network(size_t image_size) : kImageSize(image_size) {
       hidden_layer_size, vector<float>(kImageSize * kImageSize +
                                        1));  // input layer for 28*28 images
   weights[2] = vector<vector<float>>(
-      1, vector<float>(hidden_layer_size + 1));  // first hidden layer
+      kNumClasses, vector<float>(hidden_layer_size + 1));  // first hidden layer
   for (size_t layer = 1; layer < num_hidden_layers_ + 2; layer++) {
     for (size_t i = 0; i < weights[layer].size(); i++) {
       weights[layer][i][0] = 0;  // bias term
@@ -73,7 +73,6 @@ void Network::Train() {
     throw std::invalid_argument("Must load data before training");
   }
 
-  float output;
   float cost;
   size_t iterations = 0;
   size_t num_epochs = 40;
@@ -95,8 +94,8 @@ void Network::Train() {
         }
         layers_[0].LoadInputActivations(images_[indices_[image_index]]);
         layers_[1].ForwardPassHidden(layers_[0]);
-        output = layers_[2].ForwardPassOutput(layers_[1]);
-        cost += CalculateLoss(output, labels_[indices_[image_index]]);
+        std::vector<float> outputs = layers_[2].ForwardPassOutput(layers_[1]);
+        cost += CalculateLoss(outputs, labels_[indices_[image_index]]);
         BackPropagation(labels_[indices_[image_index]]);
         image_index++;
       }
@@ -110,7 +109,7 @@ void Network::Train() {
       }
       if (iterations % 50 == 0) {
         std::cout << "Iteration: " << iterations
-                  << ", Cost: " << cost / (batch_size) << ", Epochs: " << epoch
+                  << ", Cost: " << cost / (batch_size) << ", Epochs: " << epoch + 1
                   << " out of " << num_epochs << std::endl;
         ValidateNetwork();
       }
@@ -123,12 +122,13 @@ void Network::Train() {
   }
 }
 
-float Network::CalculateLoss(float output_activation, size_t ground_truth) {
-  if (ground_truth == 1) {
-    return -1.0 * (log(output_activation));
-  } else {
-    return -1.0 * (log(1.0 - output_activation));
-  }
+float Network::CalculateLoss(std::vector<float> output_activations, size_t ground_truth) {
+//  if (ground_truth == 1) {
+//    return -1.0 * (log(output_activation));
+//  } else {
+//    return -1.0 * (log(1.0 - output_activation));
+//  }
+  return -1.0 * log(output_activations[ground_truth]);
 }
 
 void Network::BackPropagation(size_t label) {
@@ -165,11 +165,12 @@ void Network::LoadTrainingData(std::string& images_dir,
       u_char label;
       if (training_labels.read(reinterpret_cast<char*>(&label),
                                sizeof(label))) {
-        if ((size_t)label == kPositiveClass) {
-          labels_.push_back(1);
-        } else {
-          labels_.push_back(0);
-        }
+//        if ((size_t)label == kPositiveClass) {
+//          labels_.push_back(1);
+//        } else {
+//          labels_.push_back(0);
+//        }
+        labels_.push_back(size_t(label));
         lbl_count++;
       }
     }
@@ -254,12 +255,26 @@ void Network::LoadNetwork(std::string& load_file_name) {
 size_t Network::MakePrediction(Image_t img) {
   layers_[0].LoadInputActivations(img);
   layers_[1].ForwardPassHidden(layers_[0]);
-  float output = layers_[2].ForwardPassOutput(layers_[1]);
-  if (output > positive_threshold_) {
-    return 1;
-  } else {
-    return 0;
+  std::vector<float> outputs = layers_[2].ForwardPassOutput(layers_[1]);
+  float prediction = -1;
+  float max = 0;
+  for (size_t i = 0; i < outputs.size(); i++) {
+    if (outputs[i] > max) {
+      max = outputs[i];
+      prediction = i;
+    }
   }
+  return prediction;
+//  for (float value : outputs) {
+//    if (value > output) {
+//      output = value;
+//    }
+//  }
+//  if (output > positive_threshold_) {
+//    return 1;
+//  } else {
+//    return 0;
+//  }
 }
 void Network::LoadTestingData(std::string& images_dir,
                               std::string& labels_dir) {
@@ -282,11 +297,12 @@ void Network::LoadTestingData(std::string& images_dir,
       u_char label;
       if (training_labels.read(reinterpret_cast<char*>(&label),
                                sizeof(label))) {
-        if ((size_t)label == kPositiveClass) {
-          test_labels_.push_back(1);
-        } else {
-          test_labels_.push_back(0);
-        }
+//        if ((size_t)label == kPositiveClass) {
+//          test_labels_.push_back(1);
+//        } else {
+//          test_labels_.push_back(0);
+//        }
+        test_labels_.push_back(size_t(label));
         lbl_count++;
       }
     }
@@ -323,26 +339,39 @@ void Network::LoadTestingData(std::string& images_dir,
   }
 }
 void Network::ValidateNetwork() {
-  float true_positives = 0;
-  float false_positives = 0;
-  float false_negatives = 0;
+//  float true_positives = 0;
+//  float false_positives = 0;
+//  float false_negatives = 0;
+//  for (size_t i = 0; i < test_images_.size(); i++) {
+//    size_t prediction = MakePrediction(test_images_[i]);
+//    if (test_labels_[i] == 1) {
+//      if (prediction == 1) {
+//        true_positives++;
+//      } else {
+//        false_negatives++;
+//      }
+//    } else {
+//      if (prediction == 1) {
+//        false_positives++;
+//      }
+//    }
+//  }
+//  float precision = true_positives / (true_positives + false_positives);
+//  float recall = true_positives / (true_positives + false_negatives);
+//  std::cout << "Precision: " << precision << ", Recall: " << recall
+//            << std::endl;
+  float correct = 0;
+  float incorrect = 0;
   for (size_t i = 0; i < test_images_.size(); i++) {
     size_t prediction = MakePrediction(test_images_[i]);
-    if (test_labels_[i] == 1) {
-      if (prediction == 1) {
-        true_positives++;
-      } else {
-        false_negatives++;
-      }
+    size_t answer = test_labels_[i];
+    if (prediction == answer) {
+      correct++;
     } else {
-      if (prediction == 1) {
-        false_positives++;
-      }
+      incorrect++;
     }
   }
-  float precision = true_positives / (true_positives + false_positives);
-  float recall = true_positives / (true_positives + false_negatives);
-  std::cout << "Precision: " << precision << ", Recall: " << recall
-            << std::endl;
+  float accuracy = correct / (correct + incorrect);
+  std::cout << "Accuracy: " << accuracy << std::endl;
 }
 }  // namespace neural_net

@@ -33,7 +33,7 @@ class Layer {
    * @param prev_layer the previous layer of the network
    * @return the computed activation of the final neuron
    */
-  float ForwardPassOutput(Layer& prev_layer);
+  std::vector<float> ForwardPassOutput(Layer& prev_layer);
 
   /**
    * Calculates the error of each node in the network

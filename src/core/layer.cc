@@ -39,13 +39,26 @@ void Layer::ForwardPassHidden(Layer& prev_layer) {
   UpdateValues();
 }
 
-float Layer::ForwardPassOutput(Layer& prev_layer) {
-  float output = neurons_[0].ForwardPass(weights_[0], prev_layer.values_);
+std::vector<float> Layer::ForwardPassOutput(Layer& prev_layer) {
+//  float output = neurons_[0].ForwardPass(weights_[0], prev_layer.values_);
+//  UpdateValues();
+//  return output;
+  std::vector<float> outputs;
+  std::vector<float> weighted_input_sums;
+  for (size_t i = 0; i < neurons_.size(); i++) {
+    neurons_[i].OutputPass(weights_[i], prev_layer.values_);
+    weighted_input_sums.push_back(neurons_[i].GetActivation());
+  }
+  for (size_t i = 0; i < neurons_.size(); i++) {
+    neurons_[i].Softmax(weighted_input_sums);
+    outputs.push_back(neurons_[i].GetActivation());
+  }
   UpdateValues();
-  return output;
+  return outputs;
 }
 
 void Layer::CalculateErrors(const std::vector<std::vector<float>>& next_weights, const Error_Collection_t& next_errors) {
+  // TODO: figure out how to factor in the new softmax derivatives
   vector<float> sigmoid_primes;
   for (const Neuron& neuron : neurons_) {
     sigmoid_primes.push_back(neuron.GetActivation() * (1.0 - neuron.GetActivation()));
@@ -71,7 +84,14 @@ std::vector<Neuron> Layer::GetNeurons() const{
 }
 
 void Layer::CalculateOutputError(size_t label) {
-  errors_[0] = neurons_[0].GetActivation() - label;
+//  errors_[0] = neurons_[0].GetActivation() - label;
+  for (size_t i = 0; i < errors_.size(); i++) {
+    if (i == label) {
+      errors_[i] = neurons_[i].GetActivation() - 1;
+    } else {
+      errors_[i] = neurons_[i].GetActivation() - 0;
+    }
+  }
 }
 
 Error_Collection_t Layer::GetErrors() const {
@@ -79,6 +99,7 @@ Error_Collection_t Layer::GetErrors() const {
 }
 
 void Layer::IncrementAllDeltas(const std::vector<float>& prev_values) {
+  // i is the index for current layer's neurons, j is for the previous
   for (size_t i = 0; i < deltas_.size(); i++) {
     deltas_[i][0] += errors_[i];
     for (size_t j = 1; j < deltas_[i].size(); j++) {

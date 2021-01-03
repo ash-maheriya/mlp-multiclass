@@ -38,7 +38,7 @@ class Network {
    * @param ground_truth label of the current image used for training
    * @return the loss of the network
    */
-  float CalculateLoss(float output_activation, size_t ground_truth);
+  float CalculateLoss(std::vector<float> output_activations, size_t ground_truth);
 
   /**
    * Loads the network's training data
@@ -83,10 +83,11 @@ class Network {
  private:
   const size_t kPositiveClass = 4;
   const size_t kImageSize;
+  const size_t kNumClasses = 10;
 
   size_t num_hidden_layers_ = 1;
   std::vector<Layer> layers_;
-  float learning_rate_ = 0.01;
+  float learning_rate_ = 0.1;
   float positive_threshold_ = 0.48;
 
   std::vector<Image_t> images_;
@@ -95,6 +96,6 @@ class Network {
   std::vector<Image_t> test_images_;
   std::vector<size_t> test_labels_;
   size_t batch_size = 100;
-  size_t hidden_layer_size = 64;
+  size_t hidden_layer_size = 256;
 };
 } // namespace neural_net
